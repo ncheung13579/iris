@@ -1,0 +1,40 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Data (large files — include download script instead)
+data/raw/
+data/processed/*.json
+!data/processed/.gitkeep
+
+# Checkpoints (large files — stored on Google Drive)
+checkpoints/*.pt
+!checkpoints/.gitkeep
+
+# Results (regeneratable)
+results/figures/*.png
+results/metrics/*.json
+results/feature_dashboards/*.png
+!results/figures/.gitkeep
+!results/metrics/.gitkeep
+!results/feature_dashboards/.gitkeep
+
+# Environment
+.env
+.venv/
+venv/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+rainbow_roastery_complete_guide_20260306.md
