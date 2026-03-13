@@ -18,7 +18,7 @@ IRIS investigates whether sparse autoencoders (SAEs) trained on a language model
 ### Setup
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/iris.git
+git clone https://github.com/ncheung13579/iris.git
 cd iris
 pip install -r requirements.txt
 ```
