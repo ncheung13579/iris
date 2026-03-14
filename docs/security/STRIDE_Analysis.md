@@ -1,7 +1,7 @@
 # STRIDE Threat Model — LLM Agent Pipeline
 
 **Project:** IRIS (Interpretability Research for Injection Security)
-**Author:** Nathan
+**Author:** Nathan Cheung (ncheung3@my.yorku.ca)
 **Date:** March 2026
 **Scope:** Five-stage LLM agent pipeline from training data ingestion through output delivery
 
