@@ -15,7 +15,7 @@ python launch.py
 
 That's it. The script installs all dependencies, verifies that the pre-trained models are present, and opens the IRIS dashboard in your browser.
 
-**Requirements:** Python 3.10+ and an internet connection (for the first-time dependency install). A CUDA GPU is recommended for faster inference but not required — the tool works on CPU.
+**Requirements:** Python 3.10, 3.11, or 3.12 (3.13+ is not yet supported by PyTorch/numpy). An internet connection is needed for the first-time dependency install. A CUDA GPU is recommended for faster inference but not required — the tool works on CPU.
 
 ---
 
