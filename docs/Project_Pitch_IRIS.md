@@ -2,7 +2,7 @@
 
 ## Project Proposal — CSSD 2221 Vulnerabilities & Classifications
 
-**Student:** Nathan
+**Student:** Nathan Cheung ()
 **Date:** March 2026
 
 ---

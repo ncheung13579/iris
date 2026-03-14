@@ -1,7 +1,7 @@
 # Kill Chain Decomposition — Prompt Injection Attacks
 
 **Project:** IRIS (Interpretability Research for Injection Security)
-**Author:** Nathan
+**Author:** Nathan Cheung ()
 **Date:** March 2026
 **Framework:** Adapted from Lockheed Martin Cyber Kill Chain / Course Material S06
 

@@ -4,7 +4,7 @@
 
 **Version:** 0.1 — Pre-implementation
 **Date:** March 2026
-**Author:** Nathan
+**Author:** Nathan Cheung ()
 
 ---
 
