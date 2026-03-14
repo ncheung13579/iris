@@ -15,6 +15,7 @@ data/processed/*.json
 
 # Checkpoints (large files — stored on Google Drive)
 checkpoints/*.pt
+checkpoints/*.npz
 !checkpoints/.gitkeep
 
 # Results (regeneratable)
