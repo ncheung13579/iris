@@ -1,7 +1,5 @@
 # IRIS — Neural IDS for LLM Agent Pipelines
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ncheung13579/iris/blob/master/notebooks/09_launch_app.ipynb)
-
 IRIS is an interactive security tool that detects prompt injection attacks in LLM agent pipelines by monitoring neural activation patterns using Sparse Autoencoders (SAEs). It works like a network IDS — but instead of inspecting packets, it inspects the model's internal representations.
 
 **Course:** CSSD 2221 — Introduction to Security
@@ -9,27 +7,15 @@ IRIS is an interactive security tool that detects prompt injection attacks in LL
 
 ---
 
-## Quick Start (One Click)
+## How to Run
 
-**Click the "Open in Colab" badge above**, then `Runtime > Run all`. The tool will:
-
-1. Install dependencies (~30 seconds)
-2. Load GPT-2 and the trained SAE (~60 seconds)
-3. Launch a Gradio web app with a **public URL**
-
-Open the URL in any browser. No local setup required.
-
-### Local Setup (Alternative)
-
-```bash
-git clone https://github.com/ncheung13579/iris.git
-cd iris
+```
 python launch.py
 ```
 
-That's it — `launch.py` installs dependencies, verifies checkpoints, and opens the dashboard in your browser.
+That's it. The script installs all dependencies, verifies that the pre-trained models are present, and opens the IRIS dashboard in your browser.
 
-Requires a CUDA GPU and all checkpoint files in `checkpoints/`.
+**Requirements:** Python 3.10+ and an internet connection (for the first-time dependency install). A CUDA GPU is recommended for faster inference but not required — the tool works on CPU.
 
 ---
 
@@ -97,6 +83,7 @@ Static display of the project's security analysis: STRIDE threat model, kill cha
 
 ```
 iris/
+├── launch.py                  # <-- Run this
 ├── src/
 │   ├── app.py                 # IRIS Detection Dashboard (Gradio)
 │   ├── data/                  # Dataset loading and preprocessing
@@ -105,19 +92,16 @@ iris/
 │   ├── analysis/              # Feature analysis, detection, adversarial
 │   ├── baseline/              # TF-IDF and activation baselines
 │   └── utils/                 # Seeding, device management
-├── notebooks/
-│   ├── 01-07_*.ipynb          # Research notebooks (training + experiments)
-│   ├── 08_demo.ipynb          # Pipeline demo notebook
-│   └── 09_launch_app.ipynb    # One-click dashboard launcher
-├── checkpoints/               # Trained models (Git LFS)
-├── results/                   # Figures and metrics JSON
+├── notebooks/                 # Research notebooks (background material)
+├── checkpoints/               # Pre-trained models (included)
+├── results/                   # Figures and metrics
 ├── docs/                      # Report, STRIDE, kill chain
 └── requirements.txt
 ```
 
 ## Research Notebooks
 
-The notebooks document the full research process behind the tool:
+The `notebooks/` directory documents the full research process behind the tool. These are background material — the tool itself runs independently of them.
 
 | Notebook | Purpose |
 |---|---|
@@ -138,9 +122,3 @@ The notebooks document the full research process behind the tool:
 | `docs/Design_Document.md` | Architecture and experiment plan |
 | `docs/security/STRIDE_Analysis.md` | STRIDE threat model |
 | `docs/security/Kill_Chain.md` | Kill chain decomposition |
-
----
-
-## License
-
-Academic coursework — York University, CSSD 2221, Winter 2026.
