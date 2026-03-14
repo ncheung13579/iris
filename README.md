@@ -9,6 +9,10 @@ IRIS investigates whether sparse autoencoders (SAEs) trained on a language model
 
 ## Quick Start
 
+### Launch the Dashboard (fastest)
+
+Open `notebooks/09_launch_app.ipynb` in Google Colab and run all cells. This installs dependencies, loads the pre-trained models, and launches an interactive Gradio web app with a public URL. The professor can analyze prompts, test evasion strategies, and review security analysis — all from a browser, no notebook interaction needed.
+
 ### Prerequisites
 
 - Python 3.10+
@@ -36,8 +40,11 @@ notebooks/
 ├── 05_feature_analysis.ipynb     # Identify injection-sensitive SAE features
 ├── 06_detection_pipeline.ipynb   # Build and evaluate the SAE-based detector
 ├── 07_adversarial_evasion.ipynb  # Test evasion attacks against the detector
-└── 08_demo.ipynb                 # Full pipeline demo (loads pre-trained checkpoints)
+├── 08_demo.ipynb                 # Full pipeline demo (loads pre-trained checkpoints)
+└── 09_launch_app.ipynb           # One-click launcher for the Gradio dashboard
 ```
+
+**To launch the interactive tool:** Run `09_launch_app.ipynb` on Colab (3 cells, ~60s startup).
 
 **To verify results without retraining:** Start at `08_demo.ipynb`. It loads pre-trained checkpoints from `checkpoints/` and demonstrates the full pipeline in minutes.
 
@@ -55,6 +62,7 @@ iris/
 ├── docs/                  # All project documentation
 ├── notebooks/             # Jupyter notebooks (exploration, training, demo)
 ├── src/                   # Reusable Python modules
+│   ├── app.py             # Gradio dashboard (IRIS Detection Dashboard)
 │   ├── data/              # Dataset loading and preprocessing
 │   ├── model/             # TransformerLens wrapper
 │   ├── sae/               # Sparse autoencoder architecture and training
