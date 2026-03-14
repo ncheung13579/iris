@@ -75,10 +75,16 @@ def size_str(nbytes: int) -> str:
         return f"{nbytes / (1024 * 1024 * 1024):.2f} GB"
 
 
-def step_header(num: int, total: int, title: str) -> None:
-    """Print a styled step header."""
-    print(f"\n  {CYAN}{BOLD}[{num}/{total}]{RESET} {BOLD}{title}{RESET}")
-    print(f"  {DIM}{'-' * 52}{RESET}")
+def step_header(num: int, total: int, title: str, duration: float = None) -> None:
+    """Print a styled step header, or a step completion footer."""
+    if duration is not None:
+        print(
+            f"  {GREEN}{BOLD}[{num}/{total}]{RESET} {BOLD}{title}{RESET} "
+            f"{DIM}-- done in {elapsed_str(duration)}{RESET}"
+        )
+    else:
+        print(f"\n  {CYAN}{BOLD}[{num}/{total}]{RESET} {BOLD}{title}{RESET}")
+        print(f"  {DIM}{'-' * 52}{RESET}")
 
 
 def ok(msg: str) -> None:
@@ -117,7 +123,9 @@ def check_python() -> None:
 
 
 def install_dependencies(root: Path) -> None:
-    """Install pip dependencies with live output."""
+    """Install pip dependencies with a live spinner and stopwatch."""
+    import threading
+
     reqs = root / "requirements.txt"
     n_packages = sum(
         1 for line in reqs.read_text().splitlines()
@@ -125,71 +133,81 @@ def install_dependencies(root: Path) -> None:
     )
     info(f"Installing {n_packages} packages from requirements.txt")
     info(f"This may take several minutes on first run (PyTorch is ~2 GB)")
-    print()
 
     t0 = time.time()
-    proc = subprocess.Popen(
-        [
-            sys.executable, "-m", "pip", "install",
-            "--progress-bar", "on",
-            "-r", str(reqs),
-        ],
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
-        text=True,
-        bufsize=1,
-    )
+    spinner = "|/-\\"
+    result_holder = [None]
+    phase = ["Resolving dependencies"]
 
-    installed = []
-    downloading = False
-    for line in proc.stdout:
-        stripped = line.strip()
-        if not stripped:
-            continue
+    def run_pip():
+        """Run pip in a background thread, updating phase as it goes."""
+        proc = subprocess.Popen(
+            [
+                sys.executable, "-m", "pip", "install",
+                "-r", str(reqs),
+            ],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True,
+            bufsize=1,
+        )
+        for line in proc.stdout:
+            stripped = line.strip()
+            if not stripped:
+                continue
+            if "Collecting" in stripped:
+                pkg = stripped.replace("Collecting ", "").split()[0]
+                phase[0] = f"Collecting {pkg}"
+            elif "Downloading" in stripped:
+                # Extract filename and size, e.g. "torch-2.1.0-..whl (200 MB)"
+                parts = stripped.replace("Downloading ", "").strip()
+                # Get just the filename (last path segment) and size
+                url_and_size = parts.split()
+                fname = url_and_size[0].split("/")[-1] if url_and_size else parts
+                size = url_and_size[1] if len(url_and_size) > 1 else ""
+                # Trim long filenames
+                if len(fname) > 40:
+                    fname = fname[:37] + "..."
+                phase[0] = f"Downloading {fname} {size}"
+            elif "Installing collected" in stripped:
+                phase[0] = "Installing packages"
+            elif "already satisfied" in stripped.lower():
+                pkg = stripped.split("Requirement already satisfied: ")[-1].split()[0]
+                phase[0] = f"Checking {pkg}"
+        proc.wait()
+        result_holder[0] = proc.returncode
 
-        # Show download progress lines (pip's own progress bars)
-        if "Downloading" in stripped:
-            # Extract package name and size from pip output
-            pkg_info = stripped.replace("Downloading ", "").strip()
-            print(f"\r  {CYAN}>>{RESET} {pkg_info[:70]:<70}", end="", flush=True)
-            downloading = True
-        elif downloading and ("%" in stripped or "━" in stripped or "=" in stripped):
-            # pip progress bar line --show it
-            print(f"\r  {CYAN}>>{RESET} {stripped[:70]:<70}", end="", flush=True)
-        elif "Successfully installed" in stripped:
-            if downloading:
-                print()  # newline after progress bars
-                downloading = False
-            pkgs = stripped.replace("Successfully installed ", "").split()
-            installed = pkgs
-        elif "already satisfied" in stripped.lower():
-            pass  # skip noise
-        elif "Installing collected packages" in stripped:
-            if downloading:
-                print()
-                downloading = False
-            pkg_list = stripped.replace("Installing collected packages: ", "")
-            info(f"Installing: {pkg_list[:60]}{'...' if len(pkg_list) > 60 else ''}")
-        elif stripped.startswith("WARNING"):
-            pass  # suppress pip warnings about PATH
-        elif "notice" in stripped.lower():
-            pass  # suppress pip update notices
+    pip_thread = threading.Thread(target=run_pip, daemon=True)
+    pip_thread.start()
 
-    if downloading:
-        print()  # final newline
+    # Show spinner + stopwatch + current phase while pip runs
+    i = 0
+    while pip_thread.is_alive():
+        elapsed = time.time() - t0
+        char = spinner[i % len(spinner)]
+        status = phase[0]
+        if len(status) > 50:
+            status = status[:47] + "..."
+        print(
+            f"\r  {CYAN}{char}{RESET} {status:<52} "
+            f"{DIM}[{elapsed_str(elapsed)}]{RESET}",
+            end="", flush=True,
+        )
+        i += 1
+        time.sleep(0.15)
 
-    proc.wait()
+    pip_thread.join()
     dt = time.time() - t0
 
-    if proc.returncode != 0:
-        fail(f"Dependency installation failed (exit code {proc.returncode})")
+    # Clear the spinner line
+    print(f"\r{' ' * 78}\r", end="")
+
+    if result_holder[0] != 0:
+        fail(f"Dependency installation failed (exit code {result_holder[0]})")
         info("Try manually:  pip install -r requirements.txt")
         sys.exit(1)
 
-    if installed:
-        ok(f"Installed {len(installed)} packages in {elapsed_str(dt)}")
-    else:
-        ok(f"All dependencies satisfied {DIM}(checked in {elapsed_str(dt)}){RESET}")
+    ok(f"Dependencies ready in {elapsed_str(dt)}")
 
 
 def verify_checkpoints(root: Path) -> None:
@@ -421,16 +439,14 @@ def main():
     print(BANNER)
 
     # ── Step 1: Python version ────────────────────────────────────
+    step_t0 = time.time()
     step_header(1, 5, "Environment Check")
     check_python()
-
-    device = "CUDA (GPU)" if "cuda" in str(
-        __import__("os").environ.get("CUDA_VISIBLE_DEVICES", "")
-    ) else "CPU"
-    # Defer actual CUDA check to after torch is installed
     info(f"Platform: {sys.platform}")
+    step_header(1, 5, "Environment Check", time.time() - step_t0)
 
     # ── Step 2: Dependencies ──────────────────────────────────────
+    step_t0 = time.time()
     step_header(2, 5, "Installing Dependencies")
     install_dependencies(root)
 
@@ -441,17 +457,22 @@ def main():
             gpu_name = torch.cuda.get_device_name(0)
             ok(f"CUDA available: {gpu_name}")
         else:
-            info("No GPU detected --running on CPU (this is fine)")
+            info("No GPU detected -- running on CPU (this is fine)")
     except Exception:
         info("Running on CPU")
+    step_header(2, 5, "Installing Dependencies", time.time() - step_t0)
 
     # ── Step 3: Verify checkpoints ────────────────────────────────
+    step_t0 = time.time()
     step_header(3, 5, "Verifying Model Artifacts")
     verify_checkpoints(root)
+    step_header(3, 5, "Verifying Model Artifacts", time.time() - step_t0)
 
     # ── Step 4: Load engine ───────────────────────────────────────
+    step_t0 = time.time()
     step_header(4, 5, "Initializing Neural IDS Engine")
     pipeline, build_app = load_engine(root)
+    step_header(4, 5, "Initializing Neural IDS Engine", time.time() - step_t0)
 
     # ── Step 5: Launch ────────────────────────────────────────────
     step_header(5, 5, "Launching Dashboard")

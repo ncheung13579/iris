@@ -309,12 +309,10 @@ def _verdict_html(result):
         color = "#DC2626" if prob > 0.8 else "#F59E0B"
         icon = "&#9888;&#65039;"
         label = "ALERT: INJECTION DETECTED"
-        bg = "#FEF2F2" if prob > 0.8 else "#FFFBEB"
     else:
         color = "#16A34A"
         icon = "&#9989;"
         label = "PASS: TRAFFIC CLEAR"
-        bg = "#F0FDF4"
 
     if prob > 0.8:
         threat, tc = "CRITICAL", "#DC2626"
@@ -324,11 +322,11 @@ def _verdict_html(result):
         threat, tc = "INFO", "#16A34A"
 
     return (
-        f'<div style="background:{bg};border:3px solid {color};border-radius:12px;'
+        f'<div style="border:3px solid {color};border-radius:12px;'
         f'padding:24px;text-align:center;margin-bottom:16px;">'
         f'<div style="font-size:48px;">{icon}</div>'
         f'<div style="font-size:28px;font-weight:bold;color:{color};">{label}</div>'
-        f'<div style="font-size:18px;color:#374151;margin-top:8px;">'
+        f'<div style="font-size:18px;margin-top:8px;">'
         f'Threat Probability: <b>{prob:.1%}</b></div>'
         f'<div style="margin-top:12px;display:inline-block;padding:4px 16px;'
         f'border-radius:20px;background:{tc};color:white;'
@@ -352,24 +350,25 @@ def _detector_comparison_html(result):
     at = "Detectors AGREE" if agree else "Detectors DISAGREE"
     ac = "#16A34A" if agree else "#F59E0B"
 
+    bdr = 'border-bottom:1px solid rgba(128,128,128,0.2);'
     return (
-        f'<div style="background:#F9FAFB;border:1px solid #E5E7EB;border-radius:8px;'
+        f'<div style="border:1px solid rgba(128,128,128,0.3);border-radius:8px;'
         f'padding:16px;margin-top:8px;">'
         f'<div style="font-weight:bold;font-size:16px;margin-bottom:12px;'
         f'color:{ac};">{at} (Defense-in-Depth)</div>'
         f'<table style="width:100%;border-collapse:collapse;">'
-        f'<tr style="border-bottom:1px solid #E5E7EB;">'
+        f'<tr style="{bdr}">'
         f'<td style="padding:8px;font-weight:bold;">Detection Layer</td>'
         f'<td style="padding:8px;font-weight:bold;">Type</td>'
         f'<td style="padding:8px;font-weight:bold;">Verdict</td>'
         f'<td style="padding:8px;font-weight:bold;">Threat Prob.</td></tr>'
-        f'<tr style="border-bottom:1px solid #E5E7EB;">'
+        f'<tr style="{bdr}">'
         f'<td style="padding:8px;">Layer 1: Anomaly-based</td>'
-        f'<td style="padding:8px;font-size:12px;color:#666;">SAE neural features</td>'
+        f'<td style="padding:8px;font-size:12px;opacity:0.6;">SAE neural features</td>'
         f'<td style="padding:8px;color:{sc};font-weight:bold;">{sl}</td>'
         f'<td style="padding:8px;">{sp:.1%}</td></tr>'
         f'<tr><td style="padding:8px;">Layer 2: Signature-based</td>'
-        f'<td style="padding:8px;font-size:12px;color:#666;">TF-IDF text patterns</td>'
+        f'<td style="padding:8px;font-size:12px;opacity:0.6;">TF-IDF text patterns</td>'
         f'<td style="padding:8px;color:{tc};font-weight:bold;">{tl}</td>'
         f'<td style="padding:8px;">{tp:.1%}</td></tr>'
         f'</table></div>'
@@ -448,6 +447,7 @@ def _evasion_comparison_plot(r1, r2):
 def _system_analysis_html(pipeline):
     """Build the static system analysis tab content."""
     c3 = pipeline.results.get("c3_detection_comparison", {})
+    c3_td = 'padding:6px 12px;border-bottom:1px solid rgba(128,128,128,0.15);'
     c3_rows = ""
     if "results" in c3:
         for name, m in c3["results"].items():
@@ -455,25 +455,26 @@ def _system_analysis_html(pipeline):
                 " + Logistic Regression", " + LR"
             )
             c3_rows += (
-                '<tr><td style="padding:6px 12px;">' + short + '</td>'
-                '<td style="padding:6px 12px;text-align:center;">'
+                f'<tr><td style="{c3_td}">' + short + '</td>'
+                f'<td style="{c3_td}text-align:center;">'
                 + f'{m["f1"]:.3f}</td>'
-                '<td style="padding:6px 12px;text-align:center;">'
+                f'<td style="{c3_td}text-align:center;">'
                 + f'{m["roc_auc"]:.3f}</td></tr>'
             )
 
     c4 = pipeline.results.get("c4_adversarial_evasion", {})
+    c4_td = 'padding:6px 12px;border-bottom:1px solid rgba(128,128,128,0.15);'
     c4_rows = ""
     if "per_strategy" in c4:
         for strategy, data in c4["per_strategy"].items():
             rate = data["evasion_rate"]
             color = "#DC2626" if rate > 0.5 else "#F59E0B" if rate > 0 else "#16A34A"
             c4_rows += (
-                '<tr><td style="padding:6px 12px;text-transform:capitalize;">'
+                f'<tr><td style="{c4_td}text-transform:capitalize;">'
                 + strategy + '</td>'
-                '<td style="padding:6px 12px;text-align:center;color:' + color
+                f'<td style="{c4_td}text-align:center;color:' + color
                 + ';font-weight:bold;">' + f'{rate:.0%}</td>'
-                '<td style="padding:6px 12px;text-align:center;">'
+                f'<td style="{c4_td}text-align:center;">'
                 + f'{data["evaded"]}/{data["total"]}</td></tr>'
             )
 
@@ -488,20 +489,23 @@ def _system_analysis_html(pipeline):
     ev_border = "#FECACA" if overall_ev > 0.3 else "#FDE68A"
     ev_color = "#DC2626" if overall_ev > 0.3 else "#F59E0B"
 
+    # Shared table style: no hardcoded bg/color so Gradio theme is respected
+    tbl = 'width:100%;border-collapse:collapse;border:1px solid rgba(128,128,128,0.3);'
+    th_style = 'padding:8px 12px;text-align:left;border-bottom:2px solid rgba(128,128,128,0.3);'
+    td_style = 'padding:6px 12px;border-bottom:1px solid rgba(128,128,128,0.15);'
+
     html = (
         '<div style="max-width:900px;margin:0 auto;">'
 
         # -- Concept mapping table --
         '<h3>Network Security Concept Mapping</h3>'
-        '<p style="color:#666;font-size:13px;">IRIS applies network security '
+        '<p style="opacity:0.7;font-size:13px;">IRIS applies network security '
         'principles to LLM internals. Each IRIS component maps to a familiar '
         'network security tool.</p>'
-        '<table style="width:100%;border-collapse:collapse;background:white;'
-        'border:1px solid #E5E7EB;">'
-        '<tr style="background:#1E3A5F;color:white;">'
-        '<th style="padding:8px 12px;text-align:left;">IRIS Component</th>'
-        '<th style="padding:8px 12px;text-align:left;">Network Security Analogue</th>'
-        '<th style="padding:8px 12px;text-align:left;">Function</th></tr>'
+        f'<table style="{tbl}">'
+        f'<tr><th style="{th_style}">IRIS Component</th>'
+        f'<th style="{th_style}">Network Security Analogue</th>'
+        f'<th style="{th_style}">Function</th></tr>'
     )
     concept_rows = [
         ("SAE feature activations", "Packet payload inspection", "Deep content analysis"),
@@ -516,69 +520,60 @@ def _system_analysis_html(pipeline):
         ("IDS Console log", "SIEM event log (Splunk/ELK)", "Centralized alert monitoring"),
     ]
     for i, (iris, net, func) in enumerate(concept_rows):
-        bg = ' style="background:#F9FAFB;"' if i % 2 == 1 else ""
         html += (
-            f'<tr{bg}><td style="padding:6px 12px;">{iris}</td>'
-            f'<td style="padding:6px 12px;">{net}</td>'
-            f'<td style="padding:6px 12px;">{func}</td></tr>'
+            f'<tr><td style="{td_style}">{iris}</td>'
+            f'<td style="{td_style}">{net}</td>'
+            f'<td style="{td_style}">{func}</td></tr>'
         )
     html += '</table>'
 
-    # -- Metric cards --
+    # -- Metric cards (use semi-transparent backgrounds for theme compat) --
+    card = ('border:1px solid rgba(128,128,128,0.3);border-radius:8px;'
+            'padding:16px;text-align:center;')
     html += (
         '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:24px 0;">'
-        '<div style="background:#F0FDF4;border:1px solid #BBF7D0;border-radius:8px;'
-        'padding:16px;text-align:center;">'
-        '<div style="font-size:12px;color:#666;text-transform:uppercase;">J1 Separability</div>'
+        f'<div style="{card}">'
+        '<div style="font-size:12px;opacity:0.6;text-transform:uppercase;">J1 Separability</div>'
         f'<div style="font-size:24px;font-weight:bold;color:#16A34A;">{pass_text}</div>'
-        f'<div style="font-size:11px;color:#888;">d={j1_d:.1f}, sil={j1_sil:.3f}</div></div>'
-        '<div style="background:#EFF6FF;border:1px solid #BFDBFE;border-radius:8px;'
-        'padding:16px;text-align:center;">'
-        '<div style="font-size:12px;color:#666;text-transform:uppercase;">Signatures</div>'
+        f'<div style="font-size:11px;opacity:0.5;">d={j1_d:.1f}, sil={j1_sil:.3f}</div></div>'
+        f'<div style="{card}">'
+        '<div style="font-size:12px;opacity:0.6;text-transform:uppercase;">Signatures</div>'
         '<div style="font-size:24px;font-weight:bold;color:#2563EB;">6,144</div>'
-        '<div style="font-size:11px;color:#888;">8x expansion SAE</div></div>'
-        '<div style="background:#EFF6FF;border:1px solid #BFDBFE;border-radius:8px;'
-        'padding:16px;text-align:center;">'
-        '<div style="font-size:12px;color:#666;text-transform:uppercase;">SAE F1</div>'
+        '<div style="font-size:11px;opacity:0.5;">8x expansion SAE</div></div>'
+        f'<div style="{card}">'
+        '<div style="font-size:12px;opacity:0.6;text-transform:uppercase;">SAE F1</div>'
         '<div style="font-size:24px;font-weight:bold;color:#2563EB;">0.946</div>'
-        '<div style="font-size:11px;color:#888;">vs Snort-style: 0.956</div></div>'
-        f'<div style="background:{ev_bg};border:1px solid {ev_border};border-radius:8px;'
-        f'padding:16px;text-align:center;">'
-        '<div style="font-size:12px;color:#666;text-transform:uppercase;">Evasion Rate</div>'
+        '<div style="font-size:11px;opacity:0.5;">vs Snort-style: 0.956</div></div>'
+        f'<div style="{card}">'
+        '<div style="font-size:12px;opacity:0.6;text-transform:uppercase;">Evasion Rate</div>'
         f'<div style="font-size:24px;font-weight:bold;color:{ev_color};">{overall_ev:.0%}</div>'
-        f'<div style="font-size:11px;color:#888;">'
+        f'<div style="font-size:11px;opacity:0.5;">'
         f'{c4.get("evaded",0)}/{c4.get("n_evasion_prompts",0)} evaded</div></div></div>'
     )
 
     # -- C3 + C4 tables --
     html += (
         '<h3>Detection Pipeline Comparison (C3)</h3>'
-        '<table style="width:100%;border-collapse:collapse;background:white;'
-        'border:1px solid #E5E7EB;">'
-        '<tr style="background:#F3F4F6;">'
-        '<th style="padding:8px 12px;text-align:left;">Approach</th>'
-        '<th style="padding:8px 12px;text-align:center;">F1</th>'
-        '<th style="padding:8px 12px;text-align:center;">AUC</th></tr>'
+        f'<table style="{tbl}">'
+        f'<tr><th style="{th_style}">Approach</th>'
+        f'<th style="{th_style}text-align:center;">F1</th>'
+        f'<th style="{th_style}text-align:center;">AUC</th></tr>'
         + c3_rows + '</table>'
         '<h3 style="margin-top:24px;">Adversarial Evasion Results (C4)</h3>'
-        '<table style="width:100%;border-collapse:collapse;background:white;'
-        'border:1px solid #E5E7EB;">'
-        '<tr style="background:#F3F4F6;">'
-        '<th style="padding:8px 12px;text-align:left;">Strategy</th>'
-        '<th style="padding:8px 12px;text-align:center;">Evasion Rate</th>'
-        '<th style="padding:8px 12px;text-align:center;">Evaded / Total</th></tr>'
+        f'<table style="{tbl}">'
+        f'<tr><th style="{th_style}">Strategy</th>'
+        f'<th style="{th_style}text-align:center;">Evasion Rate</th>'
+        f'<th style="{th_style}text-align:center;">Evaded / Total</th></tr>'
         + c4_rows + '</table>'
     )
 
     # -- STRIDE --
     html += (
         '<h3 style="margin-top:24px;">STRIDE Threat Model</h3>'
-        '<table style="width:100%;border-collapse:collapse;background:white;'
-        'border:1px solid #E5E7EB;">'
-        '<tr style="background:#F3F4F6;">'
-        '<th style="padding:8px 12px;text-align:left;">Category</th>'
-        '<th style="padding:8px 12px;text-align:left;">Key Threat</th>'
-        '<th style="padding:8px 12px;text-align:center;">Risk</th></tr>'
+        f'<table style="{tbl}">'
+        f'<tr><th style="{th_style}">Category</th>'
+        f'<th style="{th_style}">Key Threat</th>'
+        f'<th style="{th_style}text-align:center;">Risk</th></tr>'
     )
     stride_rows = [
         ("Spoofing", "Attacker impersonates system prompt", "High", "#DC2626"),
@@ -590,9 +585,9 @@ def _system_analysis_html(pipeline):
     ]
     for cat, threat, risk, rcolor in stride_rows:
         html += (
-            f'<tr><td style="padding:6px 12px;">{cat}</td>'
-            f'<td style="padding:6px 12px;">{threat}</td>'
-            f'<td style="padding:6px 12px;text-align:center;color:{rcolor};'
+            f'<tr><td style="{td_style}">{cat}</td>'
+            f'<td style="{td_style}">{threat}</td>'
+            f'<td style="{td_style}text-align:center;color:{rcolor};'
             f'font-weight:bold;">{risk}</td></tr>'
         )
     html += '</table>'
@@ -601,30 +596,28 @@ def _system_analysis_html(pipeline):
     html += '<h3 style="margin-top:24px;">Kill Chain: Prompt Injection Attack</h3>'
     html += '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;">'
     kc_steps = [
-        ("1. Recon", "Probe system prompt", "#FEF2F2", "#FECACA"),
-        ("2. Weaponize", "Craft payload", "#FFF7ED", "#FED7AA"),
-        ("3. Deliver", "Submit via input", "#FFFBEB", "#FDE68A"),
-        ("4. Exploit", "Model follows injection", "#FEF9C3", "#FDE047"),
-        ("5. Impact", "Data exfil / escalation", "#ECFDF5", "#A7F3D0"),
+        ("1. Recon", "Probe system prompt"),
+        ("2. Weaponize", "Craft payload"),
+        ("3. Deliver", "Submit via input"),
+        ("4. Exploit", "Model follows injection"),
+        ("5. Impact", "Data exfil / escalation"),
     ]
-    for title, desc, bg, border in kc_steps:
+    for title, desc in kc_steps:
         html += (
-            f'<div style="flex:1;min-width:150px;background:{bg};border:1px solid {border};'
+            f'<div style="flex:1;min-width:150px;border:1px solid rgba(128,128,128,0.3);'
             f'border-radius:8px;padding:12px;text-align:center;">'
             f'<div style="font-weight:bold;">{title}</div>'
-            f'<div style="font-size:11px;color:#666;">{desc}</div></div>'
+            f'<div style="font-size:11px;opacity:0.6;">{desc}</div></div>'
         )
     html += '</div>'
 
     # -- Defense in depth --
     html += (
         '<h3 style="margin-top:24px;">Defense-in-Depth Architecture</h3>'
-        '<table style="width:100%;border-collapse:collapse;background:white;'
-        'border:1px solid #E5E7EB;">'
-        '<tr style="background:#F3F4F6;">'
-        '<th style="padding:8px 12px;text-align:left;">Layer</th>'
-        '<th style="padding:8px 12px;text-align:left;">Defense</th>'
-        '<th style="padding:8px 12px;text-align:left;">Network Analogue</th></tr>'
+        f'<table style="{tbl}">'
+        f'<tr><th style="{th_style}">Layer</th>'
+        f'<th style="{th_style}">Defense</th>'
+        f'<th style="{th_style}">Network Analogue</th></tr>'
     )
     did_rows = [
         ("1. Input Filtering", "TF-IDF pattern matching", "Perimeter firewall"),
@@ -635,9 +628,9 @@ def _system_analysis_html(pipeline):
     ]
     for layer, defense, analogue in did_rows:
         html += (
-            f'<tr><td style="padding:6px 12px;">{layer}</td>'
-            f'<td style="padding:6px 12px;">{defense}</td>'
-            f'<td style="padding:6px 12px;">{analogue}</td></tr>'
+            f'<tr><td style="{td_style}">{layer}</td>'
+            f'<td style="{td_style}">{defense}</td>'
+            f'<td style="{td_style}">{analogue}</td></tr>'
         )
     html += '</table></div>'
 
@@ -869,36 +862,37 @@ def build_app(pipeline):
                 n_total = len(all_results)
                 rate = n_alerts / n_total if n_total > 0 else 0
 
+                _sc = 'border:1px solid rgba(128,128,128,0.3);border-radius:8px;padding:12px;text-align:center;'
                 stats_html = (
                     '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px;">'
-                    f'<div style="background:#F3F4F6;border-radius:8px;padding:12px;text-align:center;">'
-                    f'<div style="font-size:11px;color:#666;">TOTAL PROCESSED</div>'
+                    f'<div style="{_sc}">'
+                    f'<div style="font-size:11px;opacity:0.6;">TOTAL PROCESSED</div>'
                     f'<div style="font-size:20px;font-weight:bold;">{n_total}</div></div>'
-                    f'<div style="background:#FEF2F2;border-radius:8px;padding:12px;text-align:center;">'
-                    f'<div style="font-size:11px;color:#666;">ALERTS FIRED</div>'
+                    f'<div style="{_sc}">'
+                    f'<div style="font-size:11px;opacity:0.6;">ALERTS FIRED</div>'
                     f'<div style="font-size:20px;font-weight:bold;color:#DC2626;">{n_alerts}</div></div>'
-                    f'<div style="background:#F0FDF4;border-radius:8px;padding:12px;text-align:center;">'
-                    f'<div style="font-size:11px;color:#666;">PASSED</div>'
+                    f'<div style="{_sc}">'
+                    f'<div style="font-size:11px;opacity:0.6;">PASSED</div>'
                     f'<div style="font-size:20px;font-weight:bold;color:#16A34A;">{n_total - n_alerts}</div></div>'
-                    f'<div style="background:#EFF6FF;border-radius:8px;padding:12px;text-align:center;">'
-                    f'<div style="font-size:11px;color:#666;">ALERT RATE</div>'
+                    f'<div style="{_sc}">'
+                    f'<div style="font-size:11px;opacity:0.6;">ALERT RATE</div>'
                     f'<div style="font-size:20px;font-weight:bold;color:#2563EB;">{rate:.0%}</div></div></div>'
                 )
 
+                _th = 'padding:6px 8px;border-bottom:2px solid rgba(128,128,128,0.3);'
                 table_html = (
                     '<table style="width:100%;border-collapse:collapse;font-size:13px;">'
-                    '<tr style="background:#1E3A5F;color:white;">'
-                    '<th style="padding:6px 8px;">Time</th>'
-                    '<th style="padding:6px 8px;">Prompt</th>'
-                    '<th style="padding:6px 8px;">Top SID</th>'
-                    '<th style="padding:6px 8px;">Severity</th>'
-                    '<th style="padding:6px 8px;">Verdict</th>'
-                    '<th style="padding:6px 8px;">Action</th></tr>'
+                    f'<tr><th style="{_th}">Time</th>'
+                    f'<th style="{_th}">Prompt</th>'
+                    f'<th style="{_th}">Top SID</th>'
+                    f'<th style="{_th}">Severity</th>'
+                    f'<th style="{_th}">Verdict</th>'
+                    f'<th style="{_th}">Action</th></tr>'
                 )
                 for r in reversed(all_results[-50:]):
                     prob = r["sae_inject_prob"]
                     is_alert = r["sae_pred"] == 1
-                    row_bg = "#FEF2F2" if is_alert else "#F9FAFB"
+                    row_bg = "rgba(220,38,38,0.1)" if is_alert else "transparent"
                     sev = "CRITICAL" if prob > 0.8 else "WARNING" if prob > 0.5 else "INFO"
                     sev_color = "#DC2626" if prob > 0.8 else "#F59E0B" if prob > 0.5 else "#16A34A"
                     verdict = "ALERT" if is_alert else "PASS"
@@ -906,7 +900,7 @@ def build_app(pipeline):
                     action = "BLOCK" if is_alert else "ALLOW"
                     prompt_short = r["prompt"][:60] + "..." if len(r["prompt"]) > 60 else r["prompt"]
                     table_html += (
-                        f'<tr style="background:{row_bg};border-bottom:1px solid #E5E7EB;">'
+                        f'<tr style="background:{row_bg};border-bottom:1px solid rgba(128,128,128,0.15);">'
                         f'<td style="padding:6px 8px;font-family:monospace;">{r["timestamp"]}</td>'
                         f'<td style="padding:6px 8px;">{prompt_short}</td>'
                         f'<td style="padding:6px 8px;font-family:monospace;">SID-{r["top_sid"]}</td>'
@@ -1003,11 +997,11 @@ def build_app(pipeline):
                 for i, ex in enumerate(examples, 1):
                     tag = '<span style="color:#DC2626;">[INJ]</span>' if ex["label"] == 1 else '<span style="color:#16A34A;">[NOR]</span>'
                     ex_html += (
-                        f'<div style="padding:6px;border-bottom:1px solid #E5E7EB;">'
+                        f'<div style="padding:6px;border-bottom:1px solid rgba(128,128,128,0.15);">'
                         f'{i}. {tag} (signal={ex["activation"]:.3f}) {ex["text"]}</div>'
                     )
                 return (
-                    f'<div style="background:#F9FAFB;border:1px solid #E5E7EB;'
+                    f'<div style="border:1px solid rgba(128,128,128,0.3);'
                     f'border-radius:8px;padding:16px;">'
                     f'<h4>Signature SID-{sid}</h4>'
                     f'<p><b>Direction:</b> {direction}<br>'
@@ -1125,14 +1119,14 @@ def build_app(pipeline):
                 # Build result HTML
                 if success:
                     result_html = (
-                        '<div style="background:#F0FDF4;border:2px solid #16A34A;'
+                        '<div style="border:2px solid #16A34A;'
                         'border-radius:8px;padding:16px;text-align:center;">'
                         '<div style="font-size:24px;font-weight:bold;color:#16A34A;">'
                         'CHALLENGE PASSED</div>'
                     )
                 else:
                     result_html = (
-                        '<div style="background:#FEF2F2;border:2px solid #DC2626;'
+                        '<div style="border:2px solid #DC2626;'
                         'border-radius:8px;padding:16px;text-align:center;">'
                         '<div style="font-size:24px;font-weight:bold;color:#DC2626;">'
                         'CHALLENGE FAILED</div>'
@@ -1266,7 +1260,7 @@ def build_app(pipeline):
                 evaded = r1["sae_pred"] == 1 and r2["sae_pred"] == 0
                 if evaded:
                     mod_summary = (
-                        '<div style="background:#FEF2F2;border:2px solid #DC2626;'
+                        '<div style="border:2px solid #DC2626;'
                         'border-radius:8px;padding:16px;text-align:center;">'
                         '<b style="color:#DC2626;font-size:18px;">EVASION SUCCESSFUL</b>'
                         '<br>The modified prompt evaded the anomaly-based detector.'
@@ -1275,7 +1269,7 @@ def build_app(pipeline):
                     )
                 else:
                     mod_summary = (
-                        '<div style="background:#F0FDF4;border:2px solid #16A34A;'
+                        '<div style="border:2px solid #16A34A;'
                         'border-radius:8px;padding:16px;text-align:center;">'
                         '<b style="color:#16A34A;font-size:18px;">EVASION BLOCKED</b>'
                         '<br>The Neural IDS still detected the modified prompt.'
@@ -1283,7 +1277,7 @@ def build_app(pipeline):
                     )
 
                 orig_summary = (
-                    '<div style="background:#F9FAFB;border:1px solid #E5E7EB;'
+                    '<div style="border:1px solid rgba(128,128,128,0.3);'
                     'border-radius:8px;padding:16px;text-align:center;">'
                     f'<b>Original:</b> {"ALERT" if r1["sae_pred"]==1 else "PASS"} '
                     f'({r1["sae_inject_prob"]:.0%})</div>'
@@ -1309,7 +1303,110 @@ def build_app(pipeline):
             )
             gr.HTML(_system_analysis_html(pipeline))
 
+        # ── Tab 7: Guide ──────────────────────────────────────────────
+        with gr.Tab("Guide"):
+            gr.Markdown(_guide_markdown())
+
     return app
+
+
+def _guide_markdown() -> str:
+    """Return the embedded tutorial as Markdown for the Guide tab."""
+    return """
+## How IRIS Works
+
+IRIS is a **neural intrusion detection system** for LLM agent pipelines. When you submit a prompt, it runs through a 5-stage detection pipeline:
+
+1. **GPT-2 Forward Pass** -- The prompt is tokenized and run through GPT-2 Small. We extract the residual stream activation at layer 0 (a 768-dimensional vector).
+2. **SAE Decomposition** -- The Sparse Autoencoder expands the 768-dim vector into 6,144 sparse features. Most are near-zero; only a handful "fire" for any given prompt.
+3. **Signature Matching** -- Each feature has a sensitivity score: positive = injection indicator, negative = normal indicator. These are the detection "signatures."
+4. **Dual-Detector Vote** -- Two classifiers vote independently:
+   - **Anomaly-based (SAE):** Logistic regression on neural features -- like a behavioral IDS
+   - **Signature-based (TF-IDF):** Logistic regression on text patterns -- like Snort
+5. **Verdict** -- ALERT (injection detected) or PASS (traffic clear), with threat probability and severity.
+
+---
+
+## Tab Guide
+
+### Live Analysis
+Type any prompt to get an instant threat assessment. The verdict banner shows ALERT/PASS with threat probability. Below it, the **defense-in-depth comparison** shows both detectors' results, the **signature chart** shows which features fired most, and the **alert explanation** gives a natural-language summary.
+
+**Severity levels:** CRITICAL (>80%), WARNING (50-80%), INFO (<50%)
+
+### Neural IDS Console
+Batch-process prompts and monitor them like a SOC analyst. Set the batch size, optionally add a custom prompt, and review the timestamped log table. Export as CSV for offline analysis.
+
+### Signature Management
+Browse all 6,144 detection signatures ranked by confidence. Click any signature to see its top-triggering prompts. The **ablation table** shows how F1 changes as you enable more signatures -- if top-50 signatures match the full 6,144, the SAE successfully isolated the most important features.
+
+**Key terms:**
+- **SID** = Signature ID (SID-0 through SID-6143)
+- **Direction** = "Injection-sensitive" (fires more on injections) or "Normal-sensitive"
+- **Confidence** = Absolute sensitivity score; higher = more discriminative
+
+### Red Team Lab
+A 5-level pentest exercise. Craft prompts that evade detection, progressing from basic injections (Level 1) to mimicry attacks (Level 4) and free-form APT-style attacks (Level 5). Each level maps to a network security concept.
+
+| Level | Challenge | Security Parallel |
+|---|---|---|
+| 1 | Direct injection | Known exploit |
+| 2 | Context manipulation | Social engineering |
+| 3 | Paraphrased injection | Polymorphic malware |
+| 4 | Mimicry attack | Zero-day exploit |
+| 5 | Free-form APT | Advanced persistent threat |
+
+### Evasion Lab
+Side-by-side comparison: enter an original injection and a modified version, then compare how signature activations change. See whether your modification evades or is blocked.
+
+### System Analysis
+Static display of security analysis: STRIDE threat model, kill chain, defense-in-depth architecture, and the concept mapping table linking every IRIS component to its network security analogue.
+
+---
+
+## Key Metrics
+
+| Metric | Meaning | Our Result |
+|---|---|---|
+| **Threat Probability** | SAE detector's confidence a prompt is an injection (0-100%) | -- |
+| **F1 Score** | Balance of precision and recall (0-1, higher is better) | 0.946 (SAE) |
+| **AUC** | Ability to rank injections above normal prompts (0-1) | 0.973 (SAE) |
+| **Cohen's d** | Activation distribution separation (>0.8 is large) | 10.2 |
+| **Evasion Rate** | % of modified injections that fool the detector | 32% overall |
+
+---
+
+## Glossary
+
+| Term | Definition |
+|---|---|
+| **SAE** | Sparse Autoencoder -- decomposes activations into interpretable features |
+| **SID** | Signature ID -- unique label for each SAE feature |
+| **Residual Stream** | Main information highway in a transformer |
+| **Sensitivity Score** | How much more a feature fires on injections vs. normal prompts |
+| **TF-IDF** | Text representation for classical ML (surface-level patterns) |
+| **STRIDE** | Threat model: Spoofing, Tampering, Repudiation, Info Disclosure, DoS, Elevation of Privilege |
+| **Kill Chain** | Attack stages: Recon, Weaponize, Deliver, Exploit, Impact |
+| **Defense-in-Depth** | Multiple independent layers of defense |
+| **Mimicry Attack** | Injection that produces activation patterns identical to normal text |
+| **Zero-day** | Attack with no existing detection signature |
+
+---
+
+## FAQ
+
+**Why GPT-2 Small?** It's small enough to run on a laptop CPU while demonstrating the core concept. SAE decomposition applies to any transformer.
+
+**Why two detectors?** Defense-in-depth. TF-IDF catches surface patterns; SAE catches internal activation anomalies. Together they cover more attack types.
+
+**Why does mimicry achieve 100% evasion?** Mimicry attacks are crafted to match normal activation patterns exactly -- the neural equivalent of a zero-day. No signature exists for them.
+
+**How is this different from keyword filtering?** Keywords are trivially bypassed by paraphrasing. IRIS inspects how the model *internally processes* the prompt, not just the surface text.
+
+---
+
+*Full tutorial with walkthrough examples: see `docs/Tutorial.md`*
+"""
 
 
 # ---------------------------------------------------------------------------
