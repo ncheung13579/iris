@@ -118,7 +118,10 @@ The `notebooks/` directory documents the full research process behind the tool. 
 
 | Document | Purpose |
 |---|---|
+| `docs/Tutorial.md` | Step-by-step guide to using the dashboard |
 | `docs/Project_Report.md` | Comprehensive project report |
 | `docs/Design_Document.md` | Architecture and experiment plan |
 | `docs/security/STRIDE_Analysis.md` | STRIDE threat model |
 | `docs/security/Kill_Chain.md` | Kill chain decomposition |
+
+The tutorial is also available inside the dashboard under the **Guide** tab.
