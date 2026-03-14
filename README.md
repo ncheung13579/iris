@@ -24,9 +24,10 @@ Open the URL in any browser. No local setup required.
 ```bash
 git clone https://github.com/ncheung13579/iris.git
 cd iris
-pip install -r requirements.txt
-python -m src.app
+python launch.py
 ```
+
+That's it — `launch.py` installs dependencies, verifies checkpoints, and opens the dashboard in your browser.
 
 Requires a CUDA GPU and all checkpoint files in `checkpoints/`.
 
