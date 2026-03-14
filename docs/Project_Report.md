@@ -2,7 +2,7 @@
 
 ## Interpretability Research for Injection Security
 
-**Author:** Nathan
+**Author:** Nathan Cheung (ncheung3@my.yorku.ca)
 **Course:** CSSD 2221 — Vulnerabilities & Classifications
 **Date:** March 2026
 **Repository:** [github.com/ncheung13579/iris](https://github.com/ncheung13579/iris)
