@@ -1,0 +1,14 @@
+{
+  "experiment": "C1",
+  "layer": 0,
+  "expansion_factor": 8,
+  "d_sae": 6144,
+  "sparsity_coeff": 0.0001,
+  "epochs": 100,
+  "n_samples": 1000,
+  "reconstruction_ratio": 66.20779546104279,
+  "mean_sparsity": 0.42858224362134933,
+  "dead_features": 493,
+  "dead_feature_pct": 8.024088541666666,
+  "mean_active_per_prompt": 2633.322
+}

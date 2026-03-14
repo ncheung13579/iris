@@ -1,0 +1,19 @@
+{
+  "train_layer": 9,
+  "expansion_factor": 4,
+  "d_sae": 3072,
+  "sparsity_coeff": 0.001,
+  "epochs": 20,
+  "evaluation": {
+    "mean_mse": 0.6407667547464371,
+    "input_variance": 4.018444061279297,
+    "j2_ratio": 0.15945643263289447,
+    "j2_pass": "False",
+    "mean_sparsity": 0.2863256633281708,
+    "sparsity_pass": "False",
+    "dead_features": 225,
+    "dead_feature_pct": 3.662109375,
+    "total_features": 6144
+  },
+  "j2_passed": false
+}
