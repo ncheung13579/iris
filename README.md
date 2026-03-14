@@ -4,7 +4,7 @@
 
 IRIS is an interactive security tool that detects prompt injection attacks in LLM agent pipelines by monitoring neural activation patterns using Sparse Autoencoders (SAEs). It works like a network IDS — but instead of inspecting packets, it inspects the model's internal representations.
 
-**Course:** EECS 4481 — Computer Security Project
+**Course:** CSSD 2221 — Introduction to Security
 **Term:** Winter 2026, York University
 
 ---
@@ -142,4 +142,4 @@ The notebooks document the full research process behind the tool:
 
 ## License
 
-Academic coursework — York University, EECS 4481, Winter 2026.
+Academic coursework — York University, CSSD 2221, Winter 2026.
