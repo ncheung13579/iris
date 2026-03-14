@@ -1,0 +1,104 @@
+{
+  "extraction": {
+    "TF-IDF + LogReg": {
+      "detection_rate": 1.0,
+      "n_samples": 24,
+      "class": "injection"
+    },
+    "Raw Activation + LogReg": {
+      "detection_rate": 0.9583333333333334,
+      "n_samples": 24,
+      "class": "injection"
+    },
+    "SAE Features (all) + LogReg": {
+      "detection_rate": 1.0,
+      "n_samples": 24,
+      "class": "injection"
+    }
+  },
+  "indirect": {
+    "TF-IDF + LogReg": {
+      "detection_rate": 1.0,
+      "n_samples": 24,
+      "class": "injection"
+    },
+    "Raw Activation + LogReg": {
+      "detection_rate": 1.0,
+      "n_samples": 24,
+      "class": "injection"
+    },
+    "SAE Features (all) + LogReg": {
+      "detection_rate": 1.0,
+      "n_samples": 24,
+      "class": "injection"
+    }
+  },
+  "instruction": {
+    "TF-IDF + LogReg": {
+      "false_positive_rate": 0.02,
+      "n_samples": 150,
+      "class": "normal"
+    },
+    "Raw Activation + LogReg": {
+      "false_positive_rate": 0.06,
+      "n_samples": 150,
+      "class": "normal"
+    },
+    "SAE Features (all) + LogReg": {
+      "false_positive_rate": 0.04666666666666667,
+      "n_samples": 150,
+      "class": "normal"
+    }
+  },
+  "mixed": {
+    "TF-IDF + LogReg": {
+      "detection_rate": 0.819672131147541,
+      "n_samples": 61,
+      "class": "injection"
+    },
+    "Raw Activation + LogReg": {
+      "detection_rate": 0.7704918032786885,
+      "n_samples": 61,
+      "class": "injection"
+    },
+    "SAE Features (all) + LogReg": {
+      "detection_rate": 0.8524590163934426,
+      "n_samples": 61,
+      "class": "injection"
+    }
+  },
+  "override": {
+    "TF-IDF + LogReg": {
+      "detection_rate": 1.0,
+      "n_samples": 20,
+      "class": "injection"
+    },
+    "Raw Activation + LogReg": {
+      "detection_rate": 1.0,
+      "n_samples": 20,
+      "class": "injection"
+    },
+    "SAE Features (all) + LogReg": {
+      "detection_rate": 1.0,
+      "n_samples": 20,
+      "class": "injection"
+    }
+  },
+  "roleplay": {
+    "TF-IDF + LogReg": {
+      "detection_rate": 1.0,
+      "n_samples": 21,
+      "class": "injection"
+    },
+    "Raw Activation + LogReg": {
+      "detection_rate": 0.9523809523809523,
+      "n_samples": 21,
+      "class": "injection"
+    },
+    "SAE Features (all) + LogReg": {
+      "detection_rate": 1.0,
+      "n_samples": 21,
+      "class": "injection"
+    }
+  }
+}
