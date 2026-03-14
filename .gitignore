@@ -13,17 +13,18 @@ data/raw/
 data/processed/*.json
 !data/processed/.gitkeep
 
-# Checkpoints (large files — stored on Google Drive)
+# Checkpoints (large — stored on Google Drive)
+# For submission: use checkpoints/download_checkpoints.py to fetch them
 checkpoints/*.pt
 checkpoints/*.npz
+checkpoints/*.npy
 !checkpoints/.gitkeep
+!checkpoints/download_checkpoints.py
 
-# Results (regeneratable)
-results/figures/*.png
-results/metrics/*.json
+# Results — INCLUDED for submission (force-added)
+# results/figures/*.png
+# results/metrics/*.json
 results/feature_dashboards/*.png
-!results/figures/.gitkeep
-!results/metrics/.gitkeep
 !results/feature_dashboards/.gitkeep
 
 # Environment
