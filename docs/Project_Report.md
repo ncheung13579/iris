@@ -526,51 +526,43 @@ The injection examples are also limited in diversity: 203 are from a single sour
 
 ### 8.2 Model Size and Relevance
 
-GPT-2 Small (124M parameters) is a research-grade model from 2019. Production LLM systems use models 10-1000x larger (GPT-4, Claude, Llama-3). The internal representations of larger models may differ qualitatively from GPT-2's, and injection-sensitive features identified in GPT-2 may not transfer. The approach (train SAE, identify injection features, build detector) should transfer, but the specific features and performance numbers will not.
+GPT-2 Large (774M parameters, 36 layers) is a research-grade model from 2019. While larger than the GPT-2 Small (124M) commonly used in interpretability research (Anthropic's early SAE work, Neel Nanda's tutorials), it remains far smaller than production systems (GPT-4, Claude, Llama-3 at 10-1000x larger). We chose GPT-2 Large over Small to test whether SAE-based detection benefits from deeper representations (36 vs 12 layers), while staying within Colab T4 VRAM constraints. GPT-Neo (1.3B/2.7B) and GPT-J (6B) are also supported by TransformerLens but would not fit alongside Phi-3 on a T4. The approach (train SAE, identify injection features, build detector, apply feature steering) should transfer to larger models, but the specific features and performance numbers will not.
 
 ### 8.3 SAE Quality
 
-The SAE did not meet the formal J2 quality thresholds. The reconstruction ratio (66.21) is far from the target (< 0.1), and sparsity (42.9%) is far from the target (< 10%). This means the SAE's feature decomposition is imperfect -- features may be polysemantic (encoding multiple concepts) rather than monosemantic. The detection results should be interpreted with this caveat: a higher-quality SAE with better reconstruction and sparser features might achieve better detection performance.
+The SAE did not meet the formal J2 quality thresholds strictly. The reconstruction ratio (0.1082) is close to but above the target (< 0.1), and sparsity (14.4%) exceeds the target (< 10%). However, J3 confirmed the features are functionally interpretable (20/20 features with >=70% class coherence, 95% mean coherence), and only 3.5% of features are dead. The remaining reconstruction error is distributed across many small components rather than concentrated in injection-relevant dimensions. A higher-quality SAE with sparser features might achieve better detection performance, but the current SAE captures sufficient injection-relevant structure for the defense pipeline.
 
-### 8.4 Causal Intervention on Layer 0 Only
+### 8.4 Feature Steering Scope
 
-The C5 causal intervention experiments use the layer-0 SAE, which A1 showed is not the optimal layer for detection. The causal claims are valid but may understate the effect — repeating C5 with a layer-6 SAE would likely show stronger results. The dose-response curve and flip rates should be interpreted as lower bounds on the causal effect.
+The feature steering experiments suppress the top-20 injection-sensitive features at layer 29. While this achieves a 37% classification flip rate on injections with 97% normal fidelity, the effect may be stronger with more features or different suppression strategies (e.g., targeted amplification of normal-associated features). The dose-response curve shows smooth calibration, but adaptive steering has not been tested against adversarially crafted inputs that specifically target the steering mechanism.
 
-### 8.6 Evasion Testing Scope
+### 8.5 Evasion Testing Scope
 
-The C4 evasion experiment uses only 50 template-generated prompts. These are not adversarially optimized -- a motivated attacker with gradient access or extensive black-box probing could likely find more effective evasion strategies. The 0% evasion rates for encoded and subtle strategies should be interpreted as lower bounds on the detector's robustness, not as guarantees.
+The red team suite uses 250 attacks across 14 strategies (10 red team + 4 C4 evasion types), covering multi-language, encoding, few-shot jailbreak, tool abuse, completion steering, and more. However, these are template-generated, not adversarially optimized. A motivated attacker with gradient access or extensive black-box probing could craft more effective evasions. Payload splitting achieves 100% evasion, and multi-language/tool-abuse attacks achieve 75-85% evasion, highlighting that the SAE's English-only training data and lack of tool-specific examples are significant blind spots.
 
 ---
 
 ## 9. Future Work
 
-### 9.1 Multi-Layer Ensemble Detection
+### 9.1 Larger Base Models
 
-A1 demonstrated that different layers capture complementary features. An ensemble detector combining SAE features from layers 0, 6, and 11 could outperform any single layer. Layer 0's surface features catch keyword-level attacks; layer 6's semantic features catch paraphrased attacks; layer 11's abstract features might catch mimicry. This is the most promising path to addressing the mimicry gap.
+Replicate the pipeline on GPT-Neo (1.3B/2.7B), GPT-J (6B), or Llama-3-8B via TransformerLens. Larger models have richer internal representations and may exhibit more discriminative injection-sensitive features. GPT-2 Large (774M) was chosen over the more commonly used GPT-2 Small (124M) to test depth scaling; extending to billion-parameter models would test whether the SAE approach scales further.
 
-### 9.2 Causal Intervention at Layer 6
+### 9.2 Multi-Language Training Data
 
-The C5 causal intervention was performed on layer 0. Repeating it on layer 6 (the best-performing layer from A1) would test whether the causal effect is stronger for deeper-layer features and whether the dose-response curve shows different characteristics.
+The red team results show 75% evasion for multi-language attacks, confirming the SAE's English-only training data is a significant blind spot. Adding multi-lingual injection examples to the training set and retraining the SAE would test whether cross-lingual injection features emerge naturally or require architectural changes.
 
-### 9.3 Larger and More Diverse Datasets
+### 9.3 Multi-Layer Ensemble Detection
 
-Scale to 5000-10000 examples per class with greater diversity: multi-lingual injections, multi-turn attacks, indirect injections embedded in retrieved documents, and real-world injection attempts from production systems (if available).
+Different layers capture complementary features (J1 showed varying silhouette scores across 36 layers). An ensemble detector combining SAE features from early, middle, and late layers could outperform any single layer, potentially catching attacks that slip through layer 29's blind spots.
 
-### 9.4 Larger Models
+### 9.4 Adversarial Robustness of Feature Steering
 
-Replicate the pipeline on GPT-2 Medium (345M), Llama-3-8B, or other models accessible via TransformerLens or similar frameworks. Larger models have richer internal representations and may exhibit more discriminative injection-sensitive features.
+The current feature steering suppresses fixed top-K features. An adversary aware of this mechanism could craft inputs that exploit different features or use the steering itself to cause misclassification of normal inputs. Testing adaptive adversaries against the steering defense is critical before deployment.
 
-### 9.5 Combined Text and Activation Detection
+### 9.5 Real-Time Deployment
 
-The C3 results show TF-IDF and SAE features have complementary strengths. A combined detector that uses both text features and SAE activation features as input to a single classifier could outperform either alone. The text features catch keyword-level patterns; the SAE features catch activation-level patterns that survive keyword avoidance.
-
-### 9.6 Adversarial Training
-
-Include C4-style evasion examples (especially mimicry) in the detector's training set. This directly addresses the mimicry gap by teaching the classifier that educational-style questions about injection techniques should also trigger injection-associated features. This is the fastest path to improving robustness.
-
-### 9.7 Real-Time Deployment
-
-Build a deployment prototype that monitors SAE feature activations in real-time during model inference, flagging prompts that trigger injection-sensitive features above a threshold. This would require integration with a production model serving infrastructure and performance optimization (the current SAE adds latency to every inference).
+Build a deployment prototype that monitors SAE feature activations in real-time during model inference. This would require integration with production model serving infrastructure and performance optimization — the current pipeline adds ~50ms latency per prompt on a T4 GPU.
 
 ---
 
