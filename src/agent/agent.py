@@ -285,8 +285,12 @@ def load_phi3(
     model_name = "microsoft/Phi-3-mini-4k-instruct"
     print(f"Loading {model_name}...")
 
-    tokenizer = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True)
+    tokenizer = AutoTokenizer.from_pretrained(model_name)
 
+    # Phi-3 is natively supported in transformers>=4.44, so we do NOT use
+    # trust_remote_code=True. The bundled custom modeling code has a known
+    # DynamicCache.seen_tokens incompatibility with newer transformers.
+    # Using attn_implementation="eager" avoids flash-attention requirements.
     if quantize_4bit:
         from transformers import BitsAndBytesConfig
 
@@ -299,14 +303,14 @@ def load_phi3(
             model_name,
             quantization_config=bnb_config,
             device_map="auto",
-            trust_remote_code=True,
+            attn_implementation="eager",
         )
     else:
         model = AutoModelForCausalLM.from_pretrained(
             model_name,
             torch_dtype=torch.float16,
             device_map="auto",
-            trust_remote_code=True,
+            attn_implementation="eager",
         )
 
     model.eval()
