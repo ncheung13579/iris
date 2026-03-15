@@ -213,16 +213,16 @@ def install_dependencies(root: Path) -> None:
 def verify_checkpoints(root: Path) -> None:
     """Check that all required model files exist."""
     required = {
-        "checkpoints/sae_d6144_lambda1e-04.pt": (
-            "Sparse Autoencoder (6144-dim, trained on GPT-2 layer 0)",
+        "checkpoints/sae_d10240_lambda1e-04.pt": (
+            "Sparse Autoencoder (10240-dim, trained on GPT-2 Large layer 29)",
             "notebook 02",
         ),
         "checkpoints/sensitivity_scores.npy": (
-            "Injection-sensitivity scores (6144 signature weights)",
+            "Injection-sensitivity scores (10240 signature weights)",
             "notebook 05",
         ),
         "checkpoints/feature_matrix.npy": (
-            "Feature activation matrix (1000 prompts x 6144 features)",
+            "Feature activation matrix (1000 prompts x 10240 features)",
             "notebook 05",
         ),
         "data/processed/iris_dataset_balanced.json": (
@@ -320,7 +320,7 @@ def load_engine(root: Path) -> object:
 
     # 2. SAE checkpoint
     t0 = time.time()
-    ckpt_path = pipeline.root / "checkpoints/sae_d6144_lambda1e-04.pt"
+    ckpt_path = pipeline.root / "checkpoints/sae_d10240_lambda1e-04.pt"
     ckpt_mb = ckpt_path.stat().st_size / (1024 * 1024)
     print(
         f"  {DIM}  Loading SAE checkpoint ({ckpt_mb:.0f} MB)...{RESET}",
