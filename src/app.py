@@ -53,11 +53,6 @@ class IRISPipeline:
     - Generates alerts when signatures match (injection detected)
     """
 
-    # The layer to extract activations from. Must match the layer the SAE
-    # was trained on. Updated from 0 to 35 when upgrading to GPT-2 Large
-    # (mimicry diagnostic showed later layers encode topic-level semantics).
-    TARGET_LAYER = 35
-
     def __init__(self, project_root: str = "."):
         self.root = Path(project_root)
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -65,6 +60,7 @@ class IRISPipeline:
 
     def load(self) -> None:
         """Load all pre-trained artifacts. Call once at startup."""
+        import json
         from src.sae.architecture import SparseAutoencoder
         from src.data.dataset import IrisDataset
         from src.model.transformer import load_model
@@ -82,7 +78,7 @@ class IRISPipeline:
 
         # 2. Sparse autoencoder (the feature extraction engine)
         ckpt = torch.load(
-            self.root / "checkpoints/sae_d6144_lambda1e-04.pt",
+            self.root / "checkpoints/sae_d10240_lambda1e-04.pt",
             map_location=self.device,
         )
         cfg = ckpt["config"]
@@ -94,7 +90,13 @@ class IRISPipeline:
         self.sae.load_state_dict(ckpt["model_state_dict"])
         self.sae = self.sae.to(self.device).eval()
 
-        # 3. Detection signatures (sensitivity scores = signature confidence)
+        # 3. Target layer (read from J2 metrics so it stays in sync with SAE training)
+        j2_path = self.root / "results/metrics/j2_evaluation.json"
+        with open(j2_path) as f:
+            j2_metrics = json.load(f)
+        self.TARGET_LAYER = j2_metrics["train_layer"]
+
+        # 4. Detection signatures (sensitivity scores = signature confidence)
         self.sensitivity = np.load(
             self.root / "checkpoints/sensitivity_scores.npy"
         )
@@ -102,10 +104,10 @@ class IRISPipeline:
             self.root / "checkpoints/feature_matrix.npy"
         )
 
-        # 4. GPT-2 (activation extraction engine)
+        # 5. GPT-2 (activation extraction engine)
         self.gpt2 = load_model(device=self.device)
 
-        # 5. Train detectors (instant — logistic regression on cached features)
+        # 6. Train detectors (instant — logistic regression on cached features)
         labels = np.array(self.dataset.labels)
         self.sae_detector = train_sae_feature_baseline(
             self.feature_matrix, labels, seed=42
@@ -115,7 +117,7 @@ class IRISPipeline:
         )
         self.tfidf_detector = lr_pipe
 
-        # 6. Pre-compute top signature indices (by |sensitivity|)
+        # 7. Pre-compute top signature indices (by |sensitivity|)
         abs_sens = np.abs(self.sensitivity)
         self.top_feature_indices = np.argsort(abs_sens)[::-1]
 
