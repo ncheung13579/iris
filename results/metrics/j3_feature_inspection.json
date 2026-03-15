@@ -1,0 +1,149 @@
+{
+  "target_layer": 29,
+  "d_sae": 10240,
+  "n_features_inspected": 20,
+  "n_coherent_70pct": 20,
+  "mean_coherence": 0.9549999999999998,
+  "features": [
+    {
+      "feature": 5869,
+      "sensitivity": -6.827834606170654,
+      "direction": "normal",
+      "coherence": 1.0,
+      "matches": 10
+    },
+    {
+      "feature": 6797,
+      "sensitivity": 5.4490509033203125,
+      "direction": "injection",
+      "coherence": 1.0,
+      "matches": 10
+    },
+    {
+      "feature": 9163,
+      "sensitivity": -5.297110557556152,
+      "direction": "normal",
+      "coherence": 1.0,
+      "matches": 10
+    },
+    {
+      "feature": 6269,
+      "sensitivity": -4.920619010925293,
+      "direction": "normal",
+      "coherence": 0.9,
+      "matches": 9
+    },
+    {
+      "feature": 5771,
+      "sensitivity": -4.8609795570373535,
+      "direction": "normal",
+      "coherence": 0.9,
+      "matches": 9
+    },
+    {
+      "feature": 2974,
+      "sensitivity": -4.656221389770508,
+      "direction": "normal",
+      "coherence": 1.0,
+      "matches": 10
+    },
+    {
+      "feature": 10200,
+      "sensitivity": -4.605613708496094,
+      "direction": "normal",
+      "coherence": 1.0,
+      "matches": 10
+    },
+    {
+      "feature": 5585,
+      "sensitivity": -4.354341506958008,
+      "direction": "normal",
+      "coherence": 1.0,
+      "matches": 10
+    },
+    {
+      "feature": 7031,
+      "sensitivity": -4.303822040557861,
+      "direction": "normal",
+      "coherence": 0.9,
+      "matches": 9
+    },
+    {
+      "feature": 2454,
+      "sensitivity": -4.280641555786133,
+      "direction": "normal",
+      "coherence": 1.0,
+      "matches": 10
+    },
+    {
+      "feature": 3244,
+      "sensitivity": -4.210383415222168,
+      "direction": "normal",
+      "coherence": 0.8,
+      "matches": 8
+    },
+    {
+      "feature": 4425,
+      "sensitivity": -4.1990742683410645,
+      "direction": "normal",
+      "coherence": 1.0,
+      "matches": 10
+    },
+    {
+      "feature": 8347,
+      "sensitivity": -4.191496849060059,
+      "direction": "normal",
+      "coherence": 0.9,
+      "matches": 9
+    },
+    {
+      "feature": 6136,
+      "sensitivity": -4.165960788726807,
+      "direction": "normal",
+      "coherence": 1.0,
+      "matches": 10
+    },
+    {
+      "feature": 3005,
+      "sensitivity": 4.1386003494262695,
+      "direction": "injection",
+      "coherence": 1.0,
+      "matches": 10
+    },
+    {
+      "feature": 9810,
+      "sensitivity": -4.130794525146484,
+      "direction": "normal",
+      "coherence": 1.0,
+      "matches": 10
+    },
+    {
+      "feature": 8539,
+      "sensitivity": 4.087735176086426,
+      "direction": "injection",
+      "coherence": 0.8,
+      "matches": 8
+    },
+    {
+      "feature": 10009,
+      "sensitivity": -4.0760955810546875,
+      "direction": "normal",
+      "coherence": 1.0,
+      "matches": 10
+    },
+    {
+      "feature": 4117,
+      "sensitivity": -4.065155029296875,
+      "direction": "normal",
+      "coherence": 0.9,
+      "matches": 9
+    },
+    {
+      "feature": 826,
+      "sensitivity": -4.031382083892822,
+      "direction": "normal",
+      "coherence": 1.0,
+      "matches": 10
+    }
+  ]
+}

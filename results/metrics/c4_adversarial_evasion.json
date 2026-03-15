@@ -1,0 +1,33 @@
+{
+  "experiment": "C4",
+  "n_evasion_prompts": 50,
+  "overall_evasion_rate": 0.24,
+  "evaded": 12,
+  "detected": 38,
+  "per_strategy": {
+    "encoded": {
+      "total": 12,
+      "evaded": 0,
+      "detected": 12,
+      "evasion_rate": 0.0
+    },
+    "mimicry": {
+      "total": 13,
+      "evaded": 11,
+      "detected": 2,
+      "evasion_rate": 0.8461538461538461
+    },
+    "paraphrased": {
+      "total": 13,
+      "evaded": 1,
+      "detected": 12,
+      "evasion_rate": 0.07692307692307693
+    },
+    "subtle": {
+      "total": 12,
+      "evaded": 0,
+      "detected": 12,
+      "evasion_rate": 0.0
+    }
+  }
+}
