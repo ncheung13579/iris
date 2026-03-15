@@ -38,6 +38,9 @@ archive/**/*.npy
 venv/
 .test_env/
 
+# Project status (internal working doc, not for submission)
+PROJECT_STATUS.md
+
 # OS
 .DS_Store
 Thumbs.db
