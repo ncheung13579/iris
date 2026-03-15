@@ -1,0 +1,360 @@
+{
+  "experiment": "C2",
+  "n_features_inspected": 50,
+  "n_coherent_70pct": 48,
+  "mean_coherence": 0.924,
+  "n_injection_features": 11,
+  "n_normal_features": 39,
+  "features": [
+    {
+      "feature": 5869,
+      "sensitivity": -6.827834606170654,
+      "direction": "normal",
+      "coherence": 1.0,
+      "matches": 10
+    },
+    {
+      "feature": 6797,
+      "sensitivity": 5.4490509033203125,
+      "direction": "injection",
+      "coherence": 1.0,
+      "matches": 10
+    },
+    {
+      "feature": 9163,
+      "sensitivity": -5.297110557556152,
+      "direction": "normal",
+      "coherence": 1.0,
+      "matches": 10
+    },
+    {
+      "feature": 6269,
+      "sensitivity": -4.920619010925293,
+      "direction": "normal",
+      "coherence": 0.9,
+      "matches": 9
+    },
+    {
+      "feature": 5771,
+      "sensitivity": -4.8609795570373535,
+      "direction": "normal",
+      "coherence": 0.9,
+      "matches": 9
+    },
+    {
+      "feature": 2974,
+      "sensitivity": -4.656221389770508,
+      "direction": "normal",
+      "coherence": 1.0,
+      "matches": 10
+    },
+    {
+      "feature": 10200,
+      "sensitivity": -4.605613708496094,
+      "direction": "normal",
+      "coherence": 1.0,
+      "matches": 10
+    },
+    {
+      "feature": 5585,
+      "sensitivity": -4.354341506958008,
+      "direction": "normal",
+      "coherence": 1.0,
+      "matches": 10
+    },
+    {
+      "feature": 7031,
+      "sensitivity": -4.303822040557861,
+      "direction": "normal",
+      "coherence": 0.9,
+      "matches": 9
+    },
+    {
+      "feature": 2454,
+      "sensitivity": -4.280641555786133,
+      "direction": "normal",
+      "coherence": 1.0,
+      "matches": 10
+    },
+    {
+      "feature": 3244,
+      "sensitivity": -4.210383415222168,
+      "direction": "normal",
+      "coherence": 0.8,
+      "matches": 8
+    },
+    {
+      "feature": 4425,
+      "sensitivity": -4.1990742683410645,
+      "direction": "normal",
+      "coherence": 1.0,
+      "matches": 10
+    },
+    {
+      "feature": 8347,
+      "sensitivity": -4.191496849060059,
+      "direction": "normal",
+      "coherence": 0.9,
+      "matches": 9
+    },
+    {
+      "feature": 6136,
+      "sensitivity": -4.165960788726807,
+      "direction": "normal",
+      "coherence": 1.0,
+      "matches": 10
+    },
+    {
+      "feature": 3005,
+      "sensitivity": 4.1386003494262695,
+      "direction": "injection",
+      "coherence": 1.0,
+      "matches": 10
+    },
+    {
+      "feature": 9810,
+      "sensitivity": -4.130794525146484,
+      "direction": "normal",
+      "coherence": 1.0,
+      "matches": 10
+    },
+    {
+      "feature": 8539,
+      "sensitivity": 4.087735176086426,
+      "direction": "injection",
+      "coherence": 0.8,
+      "matches": 8
+    },
+    {
+      "feature": 10009,
+      "sensitivity": -4.0760955810546875,
+      "direction": "normal",
+      "coherence": 1.0,
+      "matches": 10
+    },
+    {
+      "feature": 4117,
+      "sensitivity": -4.065155029296875,
+      "direction": "normal",
+      "coherence": 0.9,
+      "matches": 9
+    },
+    {
+      "feature": 826,
+      "sensitivity": -4.031382083892822,
+      "direction": "normal",
+      "coherence": 1.0,
+      "matches": 10
+    },
+    {
+      "feature": 9272,
+      "sensitivity": 3.8647313117980957,
+      "direction": "injection",
+      "coherence": 1.0,
+      "matches": 10
+    },
+    {
+      "feature": 7055,
+      "sensitivity": -3.7586545944213867,
+      "direction": "normal",
+      "coherence": 1.0,
+      "matches": 10
+    },
+    {
+      "feature": 176,
+      "sensitivity": -3.7586545944213867,
+      "direction": "normal",
+      "coherence": 0.8,
+      "matches": 8
+    },
+    {
+      "feature": 6116,
+      "sensitivity": -3.7542147636413574,
+      "direction": "normal",
+      "coherence": 1.0,
+      "matches": 10
+    },
+    {
+      "feature": 875,
+      "sensitivity": -3.7356128692626953,
+      "direction": "normal",
+      "coherence": 1.0,
+      "matches": 10
+    },
+    {
+      "feature": 3895,
+      "sensitivity": -3.720832586288452,
+      "direction": "normal",
+      "coherence": 1.0,
+      "matches": 10
+    },
+    {
+      "feature": 7832,
+      "sensitivity": -3.720210075378418,
+      "direction": "normal",
+      "coherence": 0.6,
+      "matches": 6
+    },
+    {
+      "feature": 7434,
+      "sensitivity": 3.7145044803619385,
+      "direction": "injection",
+      "coherence": 1.0,
+      "matches": 10
+    },
+    {
+      "feature": 8467,
+      "sensitivity": -3.591470718383789,
+      "direction": "normal",
+      "coherence": 0.9,
+      "matches": 9
+    },
+    {
+      "feature": 9828,
+      "sensitivity": -3.528961181640625,
+      "direction": "normal",
+      "coherence": 1.0,
+      "matches": 10
+    },
+    {
+      "feature": 606,
+      "sensitivity": -3.528088092803955,
+      "direction": "normal",
+      "coherence": 0.9,
+      "matches": 9
+    },
+    {
+      "feature": 8284,
+      "sensitivity": 3.508519172668457,
+      "direction": "injection",
+      "coherence": 1.0,
+      "matches": 10
+    },
+    {
+      "feature": 8335,
+      "sensitivity": 3.497922658920288,
+      "direction": "injection",
+      "coherence": 1.0,
+      "matches": 10
+    },
+    {
+      "feature": 1664,
+      "sensitivity": 3.470404863357544,
+      "direction": "injection",
+      "coherence": 0.9,
+      "matches": 9
+    },
+    {
+      "feature": 1976,
+      "sensitivity": -3.44252347946167,
+      "direction": "normal",
+      "coherence": 1.0,
+      "matches": 10
+    },
+    {
+      "feature": 1043,
+      "sensitivity": -3.407198905944824,
+      "direction": "normal",
+      "coherence": 0.9,
+      "matches": 9
+    },
+    {
+      "feature": 5638,
+      "sensitivity": -3.3792171478271484,
+      "direction": "normal",
+      "coherence": 0.9,
+      "matches": 9
+    },
+    {
+      "feature": 4201,
+      "sensitivity": -3.377004623413086,
+      "direction": "normal",
+      "coherence": 0.9,
+      "matches": 9
+    },
+    {
+      "feature": 6053,
+      "sensitivity": -3.3270368576049805,
+      "direction": "normal",
+      "coherence": 0.9,
+      "matches": 9
+    },
+    {
+      "feature": 5649,
+      "sensitivity": -3.31731915473938,
+      "direction": "normal",
+      "coherence": 0.4,
+      "matches": 4
+    },
+    {
+      "feature": 6532,
+      "sensitivity": -3.306650161743164,
+      "direction": "normal",
+      "coherence": 1.0,
+      "matches": 10
+    },
+    {
+      "feature": 3276,
+      "sensitivity": -3.3024158477783203,
+      "direction": "normal",
+      "coherence": 0.9,
+      "matches": 9
+    },
+    {
+      "feature": 7232,
+      "sensitivity": -3.2955541610717773,
+      "direction": "normal",
+      "coherence": 0.9,
+      "matches": 9
+    },
+    {
+      "feature": 6977,
+      "sensitivity": -3.28670597076416,
+      "direction": "normal",
+      "coherence": 0.7,
+      "matches": 7
+    },
+    {
+      "feature": 2901,
+      "sensitivity": 3.256744384765625,
+      "direction": "injection",
+      "coherence": 0.9,
+      "matches": 9
+    },
+    {
+      "feature": 2436,
+      "sensitivity": -3.2422077655792236,
+      "direction": "normal",
+      "coherence": 0.8,
+      "matches": 8
+    },
+    {
+      "feature": 10180,
+      "sensitivity": 3.2292959690093994,
+      "direction": "injection",
+      "coherence": 1.0,
+      "matches": 10
+    },
+    {
+      "feature": 2011,
+      "sensitivity": 3.227907180786133,
+      "direction": "injection",
+      "coherence": 1.0,
+      "matches": 10
+    },
+    {
+      "feature": 2916,
+      "sensitivity": -3.22715425491333,
+      "direction": "normal",
+      "coherence": 0.9,
+      "matches": 9
+    },
+    {
+      "feature": 1913,
+      "sensitivity": -3.2270846366882324,
+      "direction": "normal",
+      "coherence": 0.9,
+      "matches": 9
+    }
+  ]
+}
