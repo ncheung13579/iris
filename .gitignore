@@ -27,6 +27,11 @@ checkpoints/*.npy
 results/feature_dashboards/*.png
 !results/feature_dashboards/.gitkeep
 
+# Archived checkpoints (large binary files)
+archive/**/*.pt
+archive/**/*.npz
+archive/**/*.npy
+
 # Environment
 .env
 .venv/
