@@ -1,5 +1,5 @@
 """
-TransformerLens wrapper for GPT-2 Small activation extraction.
+TransformerLens wrapper for GPT-2 Large activation extraction.
 
 This is the ONLY module that imports TransformerLens. All other modules
 access the transformer through functions defined here. This creates a
@@ -29,10 +29,10 @@ from transformer_lens import HookedTransformer
 
 def load_model(device: Optional[torch.device] = None) -> HookedTransformer:
     """
-    Load GPT-2 Small via TransformerLens.
+    Load GPT-2 Large via TransformerLens.
 
     We use float32 (not float16) because:
-      1. GPT-2 Small is only 124M params — it fits in Colab memory at fp32.
+      1. GPT-2 Large is 774M params — fits on Colab Pro GPUs at fp32.
       2. Float16 can introduce numerical issues in activation analysis,
          where we care about precise activation magnitudes.
       3. The SAE training involves computing reconstruction loss on
@@ -48,11 +48,12 @@ def load_model(device: Optional[torch.device] = None) -> HookedTransformer:
     if device is None:
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    # "gpt2" is the HuggingFace model ID for GPT-2 Small (124M params).
-    # TransformerLens downloads the weights from HuggingFace on first call
-    # and caches them locally.
+    # "gpt2-large" is the HuggingFace model ID for GPT-2 Large (774M params).
+    # Upgraded from gpt2 (124M) based on mimicry diagnostic (notebook 20):
+    # larger model encodes topic-level semantics needed to detect mimicry
+    # attacks that disguise injections as educational questions.
     model = HookedTransformer.from_pretrained(
-        "gpt2",
+        "gpt2-large",
         device=device,
     )
 
@@ -60,7 +61,7 @@ def load_model(device: Optional[torch.device] = None) -> HookedTransformer:
     # We never train the transformer — only extract its activations.
     model.eval()
 
-    print(f"Loaded GPT-2 Small: {model.cfg.n_layers} layers, "
+    print(f"Loaded GPT-2 Large: {model.cfg.n_layers} layers, "
           f"d_model={model.cfg.d_model}, "
           f"vocab={model.cfg.d_vocab}")
     return model
@@ -98,8 +99,8 @@ def extract_activations(
         input_ids: LongTensor of shape (N, seq_len) — tokenized prompts.
         attention_mask: LongTensor of shape (N, seq_len) — 1 for real
                        tokens, 0 for padding.
-        layers: Which layers to extract from. Default: all 12 layers
-                (0 through 11). Layer i gives the residual stream
+        layers: Which layers to extract from. Default: all 36 layers
+                (0 through 35). Layer i gives the residual stream
                 AFTER transformer block i.
         batch_size: Number of prompts to process at once.
 

@@ -30,9 +30,9 @@ class SparseAutoencoder(nn.Module):
     (polysemanticity).
 
     Args:
-        d_input: Dimension of the input activations (768 for GPT-2 Small).
+        d_input: Dimension of the input activations (1280 for GPT-2 Large).
         expansion_factor: How many times larger d_sae is than d_input.
-            4x (3072) for quick experiments (J2), 8x (6144) for production.
+            4x for quick experiments (J2), 8x (10240) for production.
         sparsity_coeff: Lambda weight for the L1 sparsity penalty in the loss.
             Higher values produce sparser features but worse reconstruction.
             Start with 1e-3 and tune on validation set.
@@ -46,7 +46,7 @@ class SparseAutoencoder(nn.Module):
 
     def __init__(
         self,
-        d_input: int = 768,
+        d_input: int = 1280,
         expansion_factor: int = 8,
         sparsity_coeff: float = 1e-3,
     ) -> None:

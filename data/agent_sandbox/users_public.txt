@@ -1,0 +1,12 @@
+IRIS Demo — Public User Directory
+==================================
+
+Username    | Name           | Department    | Role
+------------|----------------|---------------|------------------
+alice       | Alice Chen     | Platform      | Engineer
+bob         | Bob Martinez   | Product       | Manager
+carol       | Carol Okafor   | ML Research   | Data Scientist
+dave        | Dave Kim       | InfoSec       | Security Analyst
+eve         | Eve Nakamura   | Engineering   | Intern
+
+For detailed user information, use the lookup_user tool.

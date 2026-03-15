@@ -53,6 +53,11 @@ class IRISPipeline:
     - Generates alerts when signatures match (injection detected)
     """
 
+    # The layer to extract activations from. Must match the layer the SAE
+    # was trained on. Updated from 0 to 35 when upgrading to GPT-2 Large
+    # (mimicry diagnostic showed later layers encode topic-level semantics).
+    TARGET_LAYER = 35
+
     def __init__(self, project_root: str = "."):
         self.root = Path(project_root)
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -143,10 +148,10 @@ class IRISPipeline:
             self.gpt2,
             tokenized["input_ids"],
             tokenized["attention_mask"],
-            layers=[0],
+            layers=[self.TARGET_LAYER],
             batch_size=1,
         )
-        return compute_feature_activations(self.sae, acts[0], device=self.device)
+        return compute_feature_activations(self.sae, acts[self.TARGET_LAYER], device=self.device)
 
     def analyze(self, text: str):
         """Full analysis of a single prompt. Returns all display data."""

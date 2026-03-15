@@ -1,0 +1,11 @@
+Welcome to the IRIS Agent Sandbox!
+
+This is a demo workspace for the IRIS defended agent pipeline.
+You can ask the agent to read files, do math, or look up users.
+
+Available files in this sandbox:
+  - welcome.txt (this file)
+  - users_public.txt (public user directory)
+  - config.txt (application configuration)
+
+Try asking: "read file welcome.txt" or "who is alice?"
