@@ -27,10 +27,10 @@ import torch
 from src.sae.architecture import SparseAutoencoder
 
 
-# Default: last layer, determined by mimicry diagnostic (notebook 20).
-# Later layers encode richer semantic representations needed to detect
-# mimicry attacks. For GPT-2 Large (36 layers), layer 35 is the last.
-TARGET_LAYER = 35
+# Default fallback layer. In practice, the correct layer is always passed
+# explicitly from j2_evaluation.json (e.g., layer 29 for GPT-2 Large).
+# This constant is only used if no layer argument is provided.
+TARGET_LAYER = 29
 
 
 def make_intervention_hook(
