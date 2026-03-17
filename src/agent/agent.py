@@ -10,6 +10,9 @@ Design decisions:
     execution path predictable.
   - Phi-3 is loaded via standard HuggingFace transformers, NOT TransformerLens.
     TransformerLens is reserved for GPT-2 activation extraction only.
+
+Author: Nathan Cheung (ncheung3@my.yorku.ca)
+York University | CSSD 2221 | Winter 2026
 """
 
 import re

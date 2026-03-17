@@ -17,6 +17,9 @@ Adds three analyses that strengthen the single-split C3 results:
 
 All functions operate on pre-computed numpy arrays (cached in checkpoints/)
 so they run on CPU in seconds without needing GPT-2 or the SAE loaded.
+
+Author: Nathan Cheung (ncheung3@my.yorku.ca)
+York University | CSSD 2221 | Winter 2026
 """
 
 import json

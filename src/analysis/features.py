@@ -13,6 +13,9 @@ Both directions are informative — they tell us the SAE learned to
 distinguish the two classes.
 
 See Design Document §4.3 for the formal definition.
+
+Author: Nathan Cheung (ncheung3@my.yorku.ca)
+York University | CSSD 2221 | Winter 2026
 """
 
 from pathlib import Path

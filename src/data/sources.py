@@ -18,6 +18,9 @@ Why these sources?
   - Synthetic examples fill the gap: deepset only has ~203 injections, but
     we need ~500 total for balanced training. Templates ensure diversity
     across four attack categories from the Design Document.
+
+Author: Nathan Cheung (ncheung3@my.yorku.ca)
+York University | CSSD 2221 | Winter 2026
 """
 
 import random

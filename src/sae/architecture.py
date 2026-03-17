@@ -11,6 +11,9 @@ Architecture (from Design Document §4.2):
     Encoder: f = ReLU(W_enc · x + b_enc)   W_enc ∈ R^(d_sae × 768)
     Decoder: x̂ = W_dec · f + b_dec         W_dec ∈ R^(768 × d_sae)
     Loss = ||x - x̂||² + λ · ||f||₁
+
+Author: Nathan Cheung (ncheung3@my.yorku.ca)
+York University | CSSD 2221 | Winter 2026
 """
 
 from typing import Dict

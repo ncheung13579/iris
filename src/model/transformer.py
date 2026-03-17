@@ -13,6 +13,9 @@ Why TransformerLens instead of raw HuggingFace?
   component (e.g., "blocks.6.hook_resid_post" gives the residual
   stream after layer 6). With raw HuggingFace, we'd need to register
   forward hooks manually and handle the model internals ourselves.
+
+Author: Nathan Cheung (ncheung3@my.yorku.ca)
+York University | CSSD 2221 | Winter 2026
 """
 
 from typing import Dict, List, Optional

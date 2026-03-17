@@ -14,6 +14,9 @@ Three tiers of baseline:
 The comparison between tiers 2 and 3 is the core experiment (C3): it tests
 whether the SAE decomposition adds value beyond what's already present in
 the raw activation space.
+
+Author: Nathan Cheung (ncheung3@my.yorku.ca)
+York University | CSSD 2221 | Winter 2026
 """
 
 from typing import Dict, List, Optional, Tuple

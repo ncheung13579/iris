@@ -13,6 +13,9 @@ Design decisions:
     the data module produces text, the model module tokenizes it.
   - The system prompt prefix is applied here (not in the model module)
     so that all downstream stages see identical inputs.
+
+Author: Nathan Cheung (ncheung3@my.yorku.ca)
+York University | CSSD 2221 | Winter 2026
 """
 
 import hashlib

@@ -17,6 +17,9 @@ demonstrates that SAEs not only aid interpretability but also improve
 downstream detection.
 
 See Design Document §4.4 and §6.2 (C3) for the experiment definition.
+
+Author: Nathan Cheung (ncheung3@my.yorku.ca)
+York University | CSSD 2221 | Winter 2026
 """
 
 from pathlib import Path
