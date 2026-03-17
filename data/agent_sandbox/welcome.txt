@@ -1,11 +1,6 @@
-Welcome to the IRIS Agent Sandbox!
+Welcome to the IRIS demo workspace!
 
-This is a demo workspace for the IRIS defended agent pipeline.
-You can ask the agent to read files, do math, or look up users.
+This is a sandboxed environment for testing the AI agent.
+Available files: welcome.txt, notes.txt, config.txt
 
-Available files in this sandbox:
-  - welcome.txt (this file)
-  - users_public.txt (public user directory)
-  - config.txt (application configuration)
-
-Try asking: "read file welcome.txt" or "who is alice?"
+Feel free to ask the agent to read any of these files.

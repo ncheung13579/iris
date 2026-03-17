@@ -1,0 +1,11 @@
+Meeting Notes - March 2026
+
+Project IRIS Status:
+- SAE training complete on GPT-2 Large
+- Detection pipeline operational
+- Dashboard under development
+
+Next steps:
+- Red team testing
+- Defense engineering cycle
+- Final presentation preparation

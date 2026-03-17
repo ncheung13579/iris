@@ -8,6 +8,9 @@ verify checkpoints, and launch the interactive dashboard.
 
 Usage:
     python launch.py
+
+Author: Nathan Cheung (ncheung3@my.yorku.ca)
+York University | CSSD 2221 | Winter 2026
 """
 
 import os
@@ -49,6 +52,7 @@ BANNER = f"""
 
   {BOLD}Neural IDS for LLM Agent Pipelines{RESET}
   {DIM}Interpretability Research for Injection Security{RESET}
+  {DIM}Nathan Cheung (ncheung3@my.yorku.ca){RESET}
   {DIM}York University | CSSD 2221 | Winter 2026{RESET}
 """
 
@@ -215,7 +219,7 @@ def verify_checkpoints(root: Path) -> None:
     required = {
         "checkpoints/sae_d10240_lambda1e-04.pt": (
             "Sparse Autoencoder (10240-dim, trained on GPT-2 Large layer 29)",
-            "notebook 02",
+            "notebook 04",
         ),
         "checkpoints/sensitivity_scores.npy": (
             "Injection-sensitivity scores (10240 signature weights)",
@@ -228,6 +232,22 @@ def verify_checkpoints(root: Path) -> None:
         "data/processed/iris_dataset_balanced.json": (
             "Curated dataset (500 normal + 500 injection prompts)",
             "notebook 01",
+        ),
+        "results/metrics/j2_evaluation.json": (
+            "SAE evaluation metrics (target layer, train config)",
+            "notebook 02",
+        ),
+        "results/metrics/c3_detection_comparison.json": (
+            "Detection pipeline comparison (F1, AUC for all approaches)",
+            "notebook 06",
+        ),
+        "results/metrics/c4_adversarial_evasion.json": (
+            "Adversarial evasion rates per strategy",
+            "notebook 07",
+        ),
+        "results/metrics/defense_v2.json": (
+            "Defense v1 vs v2 comparison (evasion reduction)",
+            "notebook 16",
         ),
     }
 
@@ -364,11 +384,17 @@ def load_engine(root: Path) -> object:
         f"{DIM}({elapsed_str(dt)}){RESET}"
     )
 
-    # 4. GPT-2 (this is the slow one --downloads ~500 MB first time)
+    # 3b. Target layer (from J2 metrics)
+    j2_path = pipeline.root / "results/metrics/j2_evaluation.json"
+    with open(j2_path) as f:
+        j2_metrics = json.load(f)
+    pipeline.TARGET_LAYER = j2_metrics["train_layer"]
+
+    # 4. GPT-2 Large (the slow one -- downloads ~3 GB first time)
     t0 = time.time()
     print(
-        f"  {CYAN}>>{RESET} Loading GPT-2 Small "
-        f"{DIM}(downloads ~500 MB on first run)...{RESET}",
+        f"  {CYAN}>>{RESET} Loading GPT-2 Large "
+        f"{DIM}(downloads ~3 GB on first run)...{RESET}",
         flush=True,
     )
     # Suppress ALL output: Python-level + fd-level (TransformerLens
@@ -392,40 +418,118 @@ def load_engine(root: Path) -> object:
         sys.stderr = _real_stderr
     dt = time.time() - t0
     print(
-        f"  {GREEN}OK{RESET} GPT-2 Small loaded: "
-        f"{BOLD}12{RESET} layers, d_model={BOLD}768{RESET}, "
+        f"\r  {GREEN}OK{RESET} GPT-2 Large loaded: "
+        f"{BOLD}36{RESET} layers, d_model={BOLD}1280{RESET}, "
         f"50257 tokens {DIM}({elapsed_str(dt)}){RESET}"
     )
 
-    # 5. Train detectors
+    # 5. Train detectors with two-stage feature selection
     t0 = time.time()
     print(
         f"  {DIM}  Training detection classifiers...{RESET}",
         end="", flush=True,
     )
+    from sklearn.linear_model import LogisticRegression as LR
+    from sklearn.model_selection import train_test_split as tts
+    from sklearn.metrics import f1_score as _f1
+
     labels = np.array(pipeline.dataset.labels)
-    pipeline.sae_detector = train_sae_feature_baseline(
-        pipeline.feature_matrix, labels, seed=42
+
+    # 80/20 stratified split — training on all data overfits
+    train_idx, test_idx = tts(
+        np.arange(len(labels)), test_size=0.2,
+        stratify=labels, random_state=42,
     )
-    lr_pipe, _ = train_tfidf_baseline(
-        pipeline.dataset.texts, pipeline.dataset.labels, seed=42
+    pipeline.train_idx = train_idx
+    pipeline.test_idx = test_idx
+
+    # Stage 1: screen all features to find the important ones
+    screening_model = LR(
+        random_state=42, max_iter=1000, solver="lbfgs", C=0.01,
     )
+    screening_model.fit(
+        pipeline.feature_matrix[train_idx], labels[train_idx]
+    )
+    lr_weights = np.abs(screening_model.coef_[0])
+    pipeline.top_feature_indices = np.argsort(lr_weights)[::-1]
+
+    # Stage 2: retrain on top-50 features only (800/50 = 16:1 ratio)
+    TOP_K_DETECT = 50
+    pipeline._detect_feature_indices = pipeline.top_feature_indices[:TOP_K_DETECT]
+    pipeline.sae_detector = LR(
+        random_state=42, max_iter=1000, solver="lbfgs", C=0.0001,
+    )
+    pipeline.sae_detector.fit(
+        pipeline.feature_matrix[train_idx][:, pipeline._detect_feature_indices],
+        labels[train_idx],
+    )
+    pipeline.agent_detector = pipeline.sae_detector
+
+    # TF-IDF baseline (train split only)
+    train_texts = [pipeline.dataset.texts[i] for i in train_idx]
+    train_labels = [pipeline.dataset.labels[i] for i in train_idx]
+    lr_pipe, _ = train_tfidf_baseline(train_texts, train_labels, seed=42)
     pipeline.tfidf_detector = lr_pipe
+
+    # Report held-out performance
+    test_preds = pipeline.sae_detector.predict(
+        pipeline.feature_matrix[test_idx][:, pipeline._detect_feature_indices]
+    )
+    test_probs = pipeline.sae_detector.predict_proba(
+        pipeline.feature_matrix[test_idx][:, pipeline._detect_feature_indices]
+    )[:, 1]
+    f1_val = _f1(labels[test_idx], test_preds)
+    normal_max = test_probs[labels[test_idx] == 0].max()
+
     dt = time.time() - t0
     print(
         f"\r  {GREEN}OK{RESET} Detectors trained: "
-        f"SAE LogReg + TF-IDF LogReg {DIM}({elapsed_str(dt)}){RESET}"
+        f"SAE top-{TOP_K_DETECT} (F1={f1_val:.3f}, normal max={normal_max:.3f}) "
+        f"+ TF-IDF {DIM}({elapsed_str(dt)}){RESET}"
     )
-
-    # 6. Pre-compute top signature indices
-    abs_sens = np.abs(pipeline.sensitivity)
-    pipeline.top_feature_indices = np.argsort(abs_sens)[::-1]
 
     # 7. Load results JSONs
     pipeline.results = {}
     metrics_dir = pipeline.root / "results/metrics"
     for p in metrics_dir.glob("*.json"):
         pipeline.results[p.stem] = json.loads(p.read_text(encoding="utf-8"))
+
+    # 8. Phase 2: category fingerprints, steering defense, Phi-3
+    t0 = time.time()
+    print(
+        f"  {DIM}  Loading Phase 2 components...{RESET}",
+        end="", flush=True,
+    )
+    sys.stdout = _QuietStream()
+    sys.stderr = _QuietStream()
+    try:
+        pipeline._load_category_fingerprints()
+        pipeline._load_steering_defense()
+        pipeline._load_phi3()
+    except Exception:
+        pass
+    sys.stdout = _real_stdout
+    sys.stderr = _real_stderr
+    dt = time.time() - t0
+
+    phase2_parts = []
+    if pipeline.category_fingerprints is not None:
+        phase2_parts.append("taxonomy")
+    if pipeline.steering_defense is not None:
+        phase2_parts.append("steering")
+    if pipeline.defense_stack is not None:
+        phase2_parts.append("agent+defense")
+
+    if phase2_parts:
+        print(
+            f"\r  {GREEN}OK{RESET} Phase 2: "
+            f"{', '.join(phase2_parts)} {DIM}({elapsed_str(dt)}){RESET}"
+        )
+    else:
+        print(
+            f"\r  {YELLOW}--{RESET} Phase 2: detection-only mode "
+            f"{DIM}(Phi-3 requires GPU){RESET}"
+        )
 
     pipeline.loaded = True
 

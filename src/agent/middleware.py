@@ -8,6 +8,9 @@ for the IDS console.
 The middleware operates on a separate model (GPT-2 + SAE) from the application
 model (Phi-3), analogous to a network IDS that inspects traffic independently
 of the application it protects.
+
+Author: Nathan Cheung (ncheung3@my.yorku.ca)
+York University | CSSD 2221 | Winter 2026
 """
 
 import time
@@ -50,13 +53,17 @@ class IRISMiddleware:
     def __init__(
         self,
         pipeline: Any,
-        block_threshold: float = 0.5,
-        warn_threshold: float = 0.3,
+        block_threshold: float = 0.75,
+        warn_threshold: float = 0.4,
     ):
         self.pipeline = pipeline
         self.block_threshold = block_threshold
         self.warn_threshold = warn_threshold
         self._log: List[Dict[str, Any]] = []
+        # Use the agent-mode detector (top-K feature selection) if available,
+        # otherwise fall back to the default SAE detector probability.
+        self._agent_detector = getattr(pipeline, "agent_detector", None)
+        self._detect_features = getattr(pipeline, "_detect_features", None)
 
     def check(self, text: str) -> ScanResult:
         """Run IRIS analysis on the input text and return a scan decision.
@@ -81,7 +88,15 @@ class IRISMiddleware:
                 latency_ms=elapsed_ms,
             )
 
-        prob = result["sae_inject_prob"]
+        # Use agent detector (top-K feature selection) for calibrated probabilities
+        if self._agent_detector is not None:
+            import numpy as np
+            fv = result["feature_vector"].reshape(1, -1)
+            if self._detect_features is not None:
+                fv = self._detect_features(fv)
+            prob = float(self._agent_detector.predict_proba(fv)[0, 1])
+        else:
+            prob = result["sae_inject_prob"]
         features = result.get("features", [])
 
         # Only include features that are actually firing (activation > 0.01)
