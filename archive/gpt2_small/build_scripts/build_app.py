@@ -572,7 +572,7 @@ def build_app(pipeline: IRISPipeline) -> gr.Blocks:
             "# IRIS Detection Dashboard\\n"
             "*Interpretability Research for Injection Security* - "
             "SAE-based prompt injection detection for LLM agent pipelines\\n\\n"
-            "York University | EECS 4481 | Winter 2026"
+            "York University | CSSD 2221 | Winter 2026"
         )
 
         # ==============================================================

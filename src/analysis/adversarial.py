@@ -23,6 +23,9 @@ SAFETY (see CLAUDE.md § Prompt Injection Dataset Safety):
   - Examples target ONLY the fictional prompt "You are a helpful assistant".
   - No genuinely harmful content, no real services, no real people.
   - Every example is labeled with label=1 and source="adversarial".
+
+Author: Nathan Cheung ()
+York University | CSSD 2221 | Winter 2026
 """
 
 import random

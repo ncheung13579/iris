@@ -21,6 +21,9 @@ Metrics computed:
   3. t-SNE / UMAP visualizations — 2D projections that let us visually
      inspect whether clusters exist. These are qualitative (projections
      can distort distances) but invaluable for sanity checking.
+
+Author: Nathan Cheung ()
+York University | CSSD 2221 | Winter 2026
 """
 
 from typing import Dict, List, Optional, Tuple

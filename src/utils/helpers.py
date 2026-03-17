@@ -3,6 +3,9 @@ Shared utility functions for the IRIS project.
 
 This module provides seeding, device management, and checkpoint I/O
 that all other modules and notebooks depend on.
+
+Author: Nathan Cheung ()
+York University | CSSD 2221 | Winter 2026
 """
 
 import random

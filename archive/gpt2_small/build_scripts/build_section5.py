@@ -113,7 +113,7 @@ def build_app(pipeline):
             "activations using Sparse Autoencoders to detect prompt injection "
             "attacks — analogous to how a network IDS monitors packet traffic "
             "for malicious patterns.\n\n"
-            "York University | EECS 4481 | Winter 2026"
+            "York University | CSSD 2221 | Winter 2026"
         )
 
         # ==============================================================

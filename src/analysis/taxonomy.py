@@ -10,6 +10,9 @@ Key analyses:
   - Pairwise similarity between categories
   - Category-specific features (one-vs-rest)
   - Attack type classification from feature patterns
+
+Author: Nathan Cheung ()
+York University | CSSD 2221 | Winter 2026
 """
 
 from typing import Dict, List, Optional, Tuple

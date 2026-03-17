@@ -10,6 +10,9 @@ Design note — why a standalone training function instead of a Trainer class?
 The SAE training procedure is simple enough (fixed dataset, no data augmentation,
 no learning-rate scheduling) that a plain function keeps the code shorter and
 easier for the student to follow during presentation.
+
+Author: Nathan Cheung ()
+York University | CSSD 2221 | Winter 2026
 """
 
 from pathlib import Path

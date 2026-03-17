@@ -14,6 +14,9 @@ Key design decision: we truncate (not pad) to a fixed max length.
   - For the final-token activation extraction, we need to know where
     each prompt actually ends. Since we don't pad, the final token is
     simply the last token in the sequence.
+
+Author: Nathan Cheung ()
+York University | CSSD 2221 | Winter 2026
 """
 
 from typing import Dict, List

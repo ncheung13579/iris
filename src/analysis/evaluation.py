@@ -4,6 +4,9 @@ Standardized evaluation framework for IRIS defense metrics.
 Provides consistent metric computation across all experiments
 (detection, steering, red team, defense comparison) so that
 v1 → v2 improvements are directly comparable.
+
+Author: Nathan Cheung ()
+York University | CSSD 2221 | Winter 2026
 """
 
 import time

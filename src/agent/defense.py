@@ -12,6 +12,9 @@ experiments (e.g., "what gets through with only Layer 1?").
 
 Design: The DefenseStack orchestrates layers but doesn't own the agent.
 It wraps the agent's process() method, inserting checks at each stage.
+
+Author: Nathan Cheung ()
+York University | CSSD 2221 | Winter 2026
 """
 
 import re

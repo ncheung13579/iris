@@ -17,6 +17,9 @@ from the application it protects.
 
 Refactored from notebook 12 (causal intervention experiments) into a
 reusable defense module.
+
+Author: Nathan Cheung ()
+York University | CSSD 2221 | Winter 2026
 """
 
 from typing import Callable, Dict, List, Optional, Tuple

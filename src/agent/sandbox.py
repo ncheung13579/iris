@@ -4,6 +4,9 @@ Sandboxed file access for the IRIS agent pipeline.
 Prevents directory traversal attacks by resolving paths and ensuring
 they remain within the allowed sandbox root. This is the agent's
 equivalent of chroot — the tool can only see files we explicitly allow.
+
+Author: Nathan Cheung ()
+York University | CSSD 2221 | Winter 2026
 """
 
 from pathlib import Path
