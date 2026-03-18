@@ -1,15 +1,17 @@
 """
-Core agent pipeline with Phi-3-mini generation and keyword-based tool dispatch.
+Core agent pipeline with configurable LLM generation and keyword-based tool dispatch.
 
 Design decisions:
-  - Phi-3-mini-4k-instruct (3.8B) is used for response generation because
-    GPT-2 Small (124M, not instruction-tuned) produces incoherent responses.
-    GPT-2 remains the security sensor — we have a trained SAE on it.
+  - A configurable instruction-tuned LLM (3 tiers) is used for response
+    generation because GPT-2 (not instruction-tuned) produces incoherent
+    responses. GPT-2 remains the security sensor — we have a trained SAE on it.
   - Tool dispatch is keyword-based (deterministic regex matching), not
     LLM-driven. This is reliable for a graded demo and keeps the tool
     execution path predictable.
-  - Phi-3 is loaded via standard HuggingFace transformers, NOT TransformerLens.
+  - The LLM is loaded via standard HuggingFace transformers, NOT TransformerLens.
     TransformerLens is reserved for GPT-2 activation extraction only.
+  - All 3 model tiers use permissive open licenses (MIT / Apache 2.0) and
+    require NO HuggingFace authentication.
 
 Author: Nathan Cheung ()
 York University | CSSD 2221 | Winter 2026
@@ -78,19 +80,19 @@ class AgentResponse:
 
 
 class AgentPipeline:
-    """AI agent with Phi-3-mini generation and keyword-based tool dispatch.
+    """AI agent with configurable LLM generation and keyword-based tool dispatch.
 
     The agent processes user input through:
     1. Tool dispatch (regex-based keyword matching)
     2. Tool execution (sandboxed)
-    3. Response generation (Phi-3-mini)
+    3. Response generation (configurable LLM)
 
     Defense layers are handled externally by DefenseStack — this class
     focuses on the core agent functionality.
 
     Args:
-        phi3_model: Loaded Phi-3 model (HuggingFace CausalLM).
-        phi3_tokenizer: Corresponding tokenizer.
+        llm_model: Loaded LLM model (HuggingFace CausalLM).
+        llm_tokenizer: Corresponding tokenizer.
         tools: Dict mapping tool name to Tool instance.
         system_prompt: System prompt for the agent.
         max_new_tokens: Maximum tokens to generate per response.
@@ -98,18 +100,18 @@ class AgentPipeline:
 
     def __init__(
         self,
-        phi3_model: AutoModelForCausalLM,
-        phi3_tokenizer: AutoTokenizer,
+        llm_model: AutoModelForCausalLM,
+        llm_tokenizer: AutoTokenizer,
         tools: Dict[str, Any],
         system_prompt: str = AGENT_SYSTEM_PROMPT,
         max_new_tokens: int = 256,
     ):
-        self.model = phi3_model
-        self.tokenizer = phi3_tokenizer
+        self.model = llm_model
+        self.tokenizer = llm_tokenizer
         self.tools = tools
         self.system_prompt = system_prompt
         self.max_new_tokens = max_new_tokens
-        self.device = next(phi3_model.parameters()).device
+        self.device = next(llm_model.parameters()).device
 
     def dispatch_tool(self, user_input: str) -> Optional[Tuple[str, str]]:
         """Match user input against tool dispatch patterns.
@@ -149,10 +151,10 @@ class AgentPipeline:
         tool_result: Optional[str] = None,
         tool_name: Optional[str] = None,
     ) -> str:
-        """Generate a response using Phi-3-mini.
+        """Generate a response using the loaded LLM.
 
         Constructs a chat-format prompt with the system prompt, optional
-        tool context, and the user's message, then runs Phi-3 inference.
+        tool context, and the user's message, then runs LLM inference.
 
         Args:
             user_input: The user's message.
@@ -202,6 +204,79 @@ class AgentPipeline:
             )
 
         # Decode only the new tokens (skip the prompt)
+        new_tokens = output_ids[0, prompt_ids.shape[1]:]
+        response = self.tokenizer.decode(new_tokens, skip_special_tokens=True).strip()
+        return response
+
+    def generate_with_history(
+        self,
+        messages: List[Dict[str, str]],
+        tool_result: Optional[str] = None,
+        tool_name: Optional[str] = None,
+    ) -> str:
+        """Generate a response using full conversation context.
+
+        Builds a prompt from the system prompt plus the last 20 messages
+        (10 turns), with optional tool context appended to the latest
+        user message. Uses apply_chat_template for correct formatting
+        across all supported model architectures.
+
+        Args:
+            messages: Conversation history as list of
+                {"role": "user"/"assistant", "content": "..."} dicts.
+            tool_result: Optional output from a tool invocation.
+            tool_name: Optional name of the tool that was called.
+
+        Returns:
+            Generated response text.
+        """
+        # Truncate to last 20 messages (10 turns) to bound KV cache
+        recent = messages[-20:]
+
+        # Build the full message list with system prompt
+        chat_messages = [{"role": "system", "content": self.system_prompt}]
+
+        for msg in recent:
+            chat_messages.append({"role": msg["role"], "content": msg["content"]})
+
+        # Append tool context to the last user message if present
+        if tool_result is not None and chat_messages:
+            for i in range(len(chat_messages) - 1, -1, -1):
+                if chat_messages[i]["role"] == "user":
+                    chat_messages[i]["content"] += (
+                        f"\n\n[Tool '{tool_name}' returned:\n{tool_result}\n]"
+                    )
+                    break
+
+        # Use the tokenizer's chat template
+        if hasattr(self.tokenizer, "apply_chat_template"):
+            prompt_ids = self.tokenizer.apply_chat_template(
+                chat_messages,
+                return_tensors="pt",
+                add_generation_prompt=True,
+            ).to(self.device)
+        else:
+            # Fallback: concatenate messages manually
+            prompt_text = ""
+            for msg in chat_messages:
+                role = msg["role"]
+                content = msg["content"]
+                prompt_text += f"<|{role}|>\n{content}<|end|>\n"
+            prompt_text += "<|assistant|>\n"
+            prompt_ids = self.tokenizer(
+                prompt_text, return_tensors="pt"
+            ).input_ids.to(self.device)
+
+        with torch.no_grad():
+            output_ids = self.model.generate(
+                prompt_ids,
+                max_new_tokens=self.max_new_tokens,
+                do_sample=True,
+                temperature=0.7,
+                top_p=0.9,
+                pad_token_id=self.tokenizer.eos_token_id,
+            )
+
         new_tokens = output_ids[0, prompt_ids.shape[1]:]
         response = self.tokenizer.decode(new_tokens, skip_special_tokens=True).strip()
         return response
@@ -262,39 +337,77 @@ class AgentPipeline:
 # Model loading utilities
 # ---------------------------------------------------------------------------
 
-def load_phi3(
-    device: Optional[torch.device] = None,
-    quantize_4bit: bool = False,
-) -> Tuple[AutoModelForCausalLM, AutoTokenizer]:
-    """Load Phi-3-mini-4k-instruct for response generation.
+# 3-tier model selection: all no-auth, permissive licenses
+LLM_MODELS = {
+    "lightweight": (
+        "microsoft/Phi-3.5-mini-instruct",
+        "Phi-3.5 Mini (3.8B) — T4 compatible",
+    ),
+    "standard": (
+        "Qwen/Qwen2.5-7B-Instruct",
+        "Qwen2.5 7B — L4 compatible",
+    ),
+    "advanced": (
+        "Qwen/Qwen2.5-32B-Instruct",
+        "Qwen2.5 32B — A100 recommended",
+    ),
+}
 
-    VRAM budget on T4 (15GB):
-      - fp16: ~7.6 GB
-      - 4-bit (bitsandbytes): ~2.2 GB
 
-    If VRAM is tight (running alongside GPT-2 + SAE), enable 4-bit
-    quantization via quantize_4bit=True.
-
-    Args:
-        device: Target device. Defaults to CUDA if available.
-        quantize_4bit: If True, load with bitsandbytes 4-bit quantization.
+def detect_best_tier() -> str:
+    """Auto-detect the best LLM tier based on available VRAM.
 
     Returns:
-        Tuple of (model, tokenizer).
+        Tier name: "lightweight", "standard", or "advanced".
+    """
+    if not torch.cuda.is_available():
+        return "lightweight"
+    try:
+        vram_gb = torch.cuda.get_device_properties(0).total_mem / (1024 ** 3)
+    except Exception:
+        return "lightweight"
+
+    if vram_gb >= 30:
+        return "advanced"
+    elif vram_gb >= 16:
+        return "standard"
+    else:
+        return "lightweight"
+
+
+def load_llm(
+    tier: str = "lightweight",
+    device: Optional[torch.device] = None,
+    quantize_4bit: bool = True,
+) -> Tuple[AutoModelForCausalLM, AutoTokenizer, str]:
+    """Load the selected LLM tier with optional 4-bit quantization.
+
+    All models use permissive open licenses and require NO HuggingFace
+    authentication. 4-bit quantization via bitsandbytes keeps VRAM usage
+    low enough to run alongside GPT-2 Large + SAE.
+
+    Args:
+        tier: Model tier — "lightweight", "standard", or "advanced".
+        device: Target device. Defaults to CUDA if available.
+        quantize_4bit: If True, load with bitsandbytes nf4 quantization.
+
+    Returns:
+        Tuple of (model, tokenizer, tier_name).
     """
     if device is None:
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    model_name = "microsoft/Phi-3-mini-4k-instruct"
-    print(f"Loading {model_name}...")
+    if tier not in LLM_MODELS:
+        tier = "lightweight"
 
-    tokenizer = AutoTokenizer.from_pretrained(model_name)
+    model_id, description = LLM_MODELS[tier]
+    print(f"Loading {description} ({model_id})...")
 
-    # Phi-3 is natively supported in transformers>=4.44, so we do NOT use
-    # trust_remote_code=True. The bundled custom modeling code has a known
-    # DynamicCache.seen_tokens incompatibility with newer transformers.
-    # Using attn_implementation="eager" avoids flash-attention requirements.
-    if quantize_4bit:
+    tokenizer = AutoTokenizer.from_pretrained(model_id)
+
+    # Using attn_implementation="eager" avoids flash-attention requirements
+    # on environments where flash-attn is not installed.
+    if quantize_4bit and torch.cuda.is_available():
         from transformers import BitsAndBytesConfig
 
         bnb_config = BitsAndBytesConfig(
@@ -303,19 +416,34 @@ def load_phi3(
             bnb_4bit_quant_type="nf4",
         )
         model = AutoModelForCausalLM.from_pretrained(
-            model_name,
+            model_id,
             quantization_config=bnb_config,
             device_map="auto",
             attn_implementation="eager",
         )
     else:
         model = AutoModelForCausalLM.from_pretrained(
-            model_name,
-            torch_dtype=torch.float16,
+            model_id,
+            dtype=torch.float16,
             device_map="auto",
             attn_implementation="eager",
         )
 
     model.eval()
-    print(f"Phi-3-mini loaded on {device}")
+    print(f"{description} loaded on {device}")
+    return model, tokenizer, tier
+
+
+# Backward compatibility alias
+def load_phi3(
+    device: Optional[torch.device] = None,
+    quantize_4bit: bool = False,
+) -> Tuple[AutoModelForCausalLM, AutoTokenizer]:
+    """Legacy wrapper — loads the lightweight tier (Phi-3.5-mini).
+
+    Maintained for backward compatibility with launch.py and notebooks.
+    """
+    model, tokenizer, _ = load_llm(
+        tier="lightweight", device=device, quantize_4bit=quantize_4bit
+    )
     return model, tokenizer

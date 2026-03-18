@@ -1,6 +1,7 @@
 # IRIS — Interpretability Research for Injection Security
 # Install: pip install -r requirements.txt
 #
+# Requires Python 3.10–3.12 (gradio needs >=3.10, numpy<2 needs <3.13)
 # Tested on Google Colab (Python 3.12, CUDA 12.4, T4 GPU)
 # For exact Colab environment, run: pip freeze > requirements_freeze.txt
 
@@ -12,7 +13,7 @@ numpy>=1.24.0,<2.0.0
 transformer-lens>=2.0.0
 transformers>=4.35.0,<5.0.0
 
-# Quantization (4-bit Phi-3 for agent pipeline)
+# Quantization (4-bit LLM for agent pipeline — supports Phi-3.5/Qwen2.5)
 bitsandbytes>=0.41.0
 accelerate>=0.24.0
 
