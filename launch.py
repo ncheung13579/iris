@@ -505,7 +505,7 @@ def load_engine(root: Path) -> object:
     try:
         pipeline._load_category_fingerprints()
         pipeline._load_steering_defense()
-        pipeline._load_phi3()
+        pipeline._load_llm()
     except Exception:
         pass
     sys.stdout = _real_stdout
@@ -518,7 +518,8 @@ def load_engine(root: Path) -> object:
     if pipeline.steering_defense is not None:
         phase2_parts.append("steering")
     if pipeline.defense_stack is not None:
-        phase2_parts.append("agent+defense")
+        tier_label = pipeline.llm_tier or "unknown"
+        phase2_parts.append(f"agent+defense ({tier_label})")
 
     if phase2_parts:
         print(
@@ -528,7 +529,7 @@ def load_engine(root: Path) -> object:
     else:
         print(
             f"\r  {YELLOW}--{RESET} Phase 2: detection-only mode "
-            f"{DIM}(Phi-3 requires GPU){RESET}"
+            f"{DIM}(LLM requires GPU){RESET}"
         )
 
     pipeline.loaded = True
