@@ -1782,7 +1782,7 @@ def build_app(pipeline):
                     label="IRIS Agent",
                     height=520,
                     type="messages",
-                    buttons=["copy"],
+                    show_copy_button=True,
                     render_markdown=True,
                 )
 
