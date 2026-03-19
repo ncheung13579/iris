@@ -53,7 +53,7 @@ class IRISMiddleware:
     def __init__(
         self,
         pipeline: Any,
-        block_threshold: float = 0.75,
+        block_threshold: float = 0.85,
         warn_threshold: float = 0.4,
     ):
         self.pipeline = pipeline
