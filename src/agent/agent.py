@@ -104,7 +104,7 @@ class AgentPipeline:
         llm_tokenizer: AutoTokenizer,
         tools: Dict[str, Any],
         system_prompt: str = AGENT_SYSTEM_PROMPT,
-        max_new_tokens: int = 256,
+        max_new_tokens: int = 600,
     ):
         self.model = llm_model
         self.tokenizer = llm_tokenizer
