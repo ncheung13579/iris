@@ -1738,7 +1738,7 @@ def build_app(pipeline):
                 '<td style="padding: 6px 8px; font-weight: 600; vertical-align: top; '
                 'white-space: nowrap;">Google Colab</td>'
                 '<td style="padding: 6px 8px;">Upload the project to Drive, open '
-                '<code>notebooks/launch_app.ipynb</code> in Colab, set runtime to '
+                '<code>notebooks/launch_IRIS.ipynb</code> in Colab, set runtime to '
                 '<b>T4 GPU</b>, and click <em>Run All</em>. Easiest option — works with '
                 'a free Colab account. Supports the Lightweight tier (Phi-3.5 Mini, 3.8B).</td></tr>'
                 '<tr style="border-bottom: 1px solid rgba(245, 158, 11, 0.4);">'
