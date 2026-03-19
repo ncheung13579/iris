@@ -1,17 +1,33 @@
 # IRIS — Interpretability Research for Injection Security
 # Install: pip install -r requirements.txt
 #
-# Requires Python 3.10–3.12 (gradio needs >=3.10, numpy<2 needs <3.13)
+# Requires Python 3.10+
 # Tested on Google Colab (Python 3.12, CUDA 12.4, T4 GPU)
 # For exact Colab environment, run: pip freeze > requirements_freeze.txt
 
 # Core ML
 torch>=2.1.0,<3.0.0
-numpy>=1.24.0,<2.0.0
+numpy>=1.24.0
 
 # Transformer interpretability
+# transformer-lens pins numpy<2 but works fine with numpy 2.x (pure Python).
+# Install with --no-deps to avoid forcing a numpy downgrade on Colab.
 transformer-lens>=2.0.0
 transformers>=4.35.0,<5.0.0
+
+# transformer-lens deps not already covered by our other requirements
+einops>=0.6.0
+fancy-einsum>=0.0.3
+jaxtyping>=0.2.11
+beartype>=0.14.1,<0.15.0
+better-abc>=0.0.3,<0.0.4
+rich>=12.6.0
+sentencepiece
+typeguard>=4.2,<5.0
+typing-extensions
+transformers-stream-generator>=0.0.5,<0.0.6
+wandb>=0.13.5
+protobuf>=3.20.0
 
 # Quantization (4-bit LLM for agent pipeline — supports Phi-3.5/Qwen2.5)
 bitsandbytes>=0.41.0
