@@ -1778,12 +1778,15 @@ def build_app(pipeline):
             # LEFT COLUMN: Chat Interface (always visible)
             # ========================================================
             with gr.Column(scale=7):
-                chatbot = gr.Chatbot(
-                    label="IRIS Agent",
-                    height=520,
-                    buttons=["copy"],
-                    render_markdown=True,
-                )
+                # buttons=["copy"] is Gradio 5+, show_copy_button is Gradio 4.x
+                import inspect
+                _chatbot_params = inspect.signature(gr.Chatbot.__init__).parameters
+                _chatbot_kwargs = {"label": "IRIS Agent", "height": 520, "render_markdown": True}
+                if "buttons" in _chatbot_params:
+                    _chatbot_kwargs["buttons"] = ["copy"]
+                elif "show_copy_button" in _chatbot_params:
+                    _chatbot_kwargs["show_copy_button"] = True
+                chatbot = gr.Chatbot(**_chatbot_kwargs)
 
                 with gr.Row():
                     chat_input = gr.Textbox(
