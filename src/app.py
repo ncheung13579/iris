@@ -291,7 +291,7 @@ class IRISPipeline:
 
             tools = build_tool_registry(self.root / "data" / "agent_sandbox")
             agent = AgentPipeline(llm_model, llm_tokenizer, tools)
-            middleware = IRISMiddleware(self, block_threshold=0.80)
+            middleware = IRISMiddleware(self, block_threshold=0.85)
             self.defense_stack = DefenseStack(
                 agent=agent,
                 iris_middleware=middleware,
@@ -1856,7 +1856,7 @@ def build_app(pipeline):
                             label="L4: Output Scanning", value=True,
                         )
                         threshold_slider = gr.Slider(
-                            minimum=0.0, maximum=1.0, value=0.80, step=0.01,
+                            minimum=0.0, maximum=1.0, value=0.85, step=0.01,
                             label="L1 detection threshold",
                         )
 
