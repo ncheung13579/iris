@@ -1861,10 +1861,28 @@ def build_app(pipeline):
 
                         gr.Markdown("### Model")
                         from src.agent.agent import LLM_MODELS
-                        tier_choices = [
-                            f"{k.capitalize()}: {v[1]}"
-                            for k, v in LLM_MODELS.items()
-                        ]
+
+                        # Detect VRAM and build tier labels with availability
+                        _vram_gb = 0.0
+                        _vram_info = "CPU mode (no GPU)"
+                        if torch.cuda.is_available():
+                            try:
+                                _vram_gb = torch.cuda.get_device_properties(0).total_mem / (1024 ** 3)
+                                _vram_info = f"GPU VRAM: {_vram_gb:.1f} GB"
+                            except Exception:
+                                _vram_info = "GPU available"
+
+                        # VRAM thresholds for each tier (total needed incl. GPT-2 + SAE)
+                        _tier_vram_req = {"lightweight": 10, "standard": 16, "advanced": 30}
+                        tier_choices = []
+                        for k, v in LLM_MODELS.items():
+                            req = _tier_vram_req[k]
+                            if _vram_gb >= req or not torch.cuda.is_available():
+                                tier_choices.append(f"{k.capitalize()}: {v[1]}")
+                            else:
+                                tier_choices.append(
+                                    f"{k.capitalize()}: {v[1]} (needs {req}+ GB)")
+
                         current_tier = pipeline.llm_tier or "lightweight"
                         current_label = f"{current_tier.capitalize()}: {LLM_MODELS.get(current_tier, ('', 'Unknown'))[1]}"
                         model_selector = gr.Dropdown(
@@ -1891,22 +1909,23 @@ def build_app(pipeline):
                             interactive=pipeline.defense_stack is not None,
                         )
 
+                        # Upgrade hint
+                        gr.HTML(
+                            '<div style="font-size: 11px; opacity: 0.6; '
+                            'line-height: 1.5; margin-top: 4px;">'
+                            'To use a larger model, change your Colab runtime to a '
+                            'more powerful GPU (Runtime &gt; Change runtime type) '
+                            'and re-run the launch notebook. The best tier is '
+                            'selected automatically based on available VRAM.</div>'
+                        )
+
                         gr.Markdown("### Session")
                         clear_btn = gr.Button("Clear Conversation", size="sm")
 
                         # Model info card
-                        vram_info = ""
-                        if torch.cuda.is_available():
-                            try:
-                                vram_gb = torch.cuda.get_device_properties(0).total_mem / (1024 ** 3)
-                                vram_info = f"GPU VRAM: {vram_gb:.1f} GB"
-                            except Exception:
-                                vram_info = "GPU available"
-                        else:
-                            vram_info = "CPU mode (no GPU)"
                         gr.HTML(
                             f'<div class="iris-card" style="padding:12px;font-size:12px;">'
-                            f'<b>System:</b> {vram_info}<br>'
+                            f'<b>System:</b> {_vram_info}<br>'
                             f'<b>Security sensor:</b> GPT-2 Large (36 layers, d=1280)<br>'
                             f'<b>SAE:</b> {d_sae:,} features<br>'
                             f'<b>Device:</b> {pipeline.device}</div>'
