@@ -27,7 +27,7 @@ python launch.py
 ```
 
 The launcher will:
-1. Check your Python version (requires 3.10-3.12)
+1. Check your Python version (requires 3.10+)
 2. Install all dependencies (first run takes several minutes)
 3. Verify that all model checkpoints are present
 4. Load the Neural IDS engine (GPT-2 + SAE + detectors)
