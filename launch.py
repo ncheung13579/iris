@@ -25,7 +25,7 @@ warnings.filterwarnings("ignore", message=".*torch_dtype.*")
 warnings.filterwarnings("ignore", message=".*Blocks constructor.*")
 
 MIN_PYTHON = (3, 10)
-MAX_PYTHON = (3, 12)
+MAX_PYTHON = (3, 99)  # No upper bound — numpy 2.x works with transformer-lens
 
 # ── Terminal colors (graceful fallback if not supported) ──────────
 try:
@@ -119,7 +119,7 @@ def check_python() -> None:
         print()
         info(f"Interpreter: {sys.executable}")
         info(
-            f"Install Python 3.10-3.12 from https://www.python.org/downloads/"
+            f"Install Python 3.10+ from https://www.python.org/downloads/"
         )
         info(f"Then re-run:  python3.12 launch.py")
         sys.exit(1)
