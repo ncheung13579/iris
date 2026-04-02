@@ -1778,13 +1778,16 @@ def build_app(pipeline):
             # LEFT COLUMN: Chat Interface (always visible)
             # ========================================================
             with gr.Column(scale=7):
-                chatbot = gr.Chatbot(
-                    label="IRIS Agent",
-                    height=520,
-                    type="messages",
-                    show_copy_button=True,
-                    render_markdown=True,
-                )
+                import inspect as _ins
+                _cb_params = _ins.signature(gr.Chatbot.__init__).parameters
+                _cb_kw = {"label": "IRIS Agent", "height": 520, "render_markdown": True}
+                if "type" in _cb_params:
+                    _cb_kw["type"] = "messages"
+                if "buttons" in _cb_params:
+                    _cb_kw["buttons"] = ["copy"]
+                elif "show_copy_button" in _cb_params:
+                    _cb_kw["show_copy_button"] = True
+                chatbot = gr.Chatbot(**_cb_kw)
 
                 with gr.Row():
                     chat_input = gr.Textbox(
