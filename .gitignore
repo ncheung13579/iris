@@ -45,6 +45,12 @@ PROJECT_STATUS.md
 # scripts, exploratory checkpoints, internal status docs)
 /_private/
 
+# Report source and Word version: only the PDF is tracked for grading.
+# The DOCX and the markdown source remain locally for rebuild purposes
+# but are not part of the submission surface.
+docs/Project_Report.md
+docs/IRIS_Final_Report.docx
+
 # OS
 .DS_Store
 Thumbs.db

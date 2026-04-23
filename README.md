@@ -120,11 +120,7 @@ iris/
 │   ├── figures/                           200 DPI PNGs used in the report
 │   └── metrics/                           JSON metric dumps
 └── docs/
-    ├── IRIS_Final_Report.pdf    55-page grade deliverable
-    ├── IRIS_Final_Report.docx   same report in Word
-    ├── Project_Report.md                      markdown source for the report
-    ├── Design_Document.md                     architecture and experiment plan
-    ├── Tutorial.md                            dashboard user guide
+    ├── IRIS_Final_Report.pdf                  55-page grade deliverable
     └── security/
         ├── STRIDE_Analysis.md                 full STRIDE decomposition (39 threats, 5 stages)
         └── Kill_Chain.md                      kill chain adapted to prompt injection
@@ -136,9 +132,7 @@ iris/
 
 | Document | Purpose |
 |---|---|
-| [`docs/IRIS_Final_Report.pdf`](docs/IRIS_Final_Report.pdf) | Comprehensive project report — the authoritative reference |
-| [`docs/Tutorial.md`](docs/Tutorial.md) | Step-by-step guide to using the dashboard |
-| [`docs/Design_Document.md`](docs/Design_Document.md) | Architecture and experiment plan (pre-deployment planning doc) |
+| [`docs/IRIS_Final_Report.pdf`](docs/IRIS_Final_Report.pdf) | Comprehensive project report, the authoritative reference |
 | [`docs/security/STRIDE_Analysis.md`](docs/security/STRIDE_Analysis.md) | STRIDE threat model for the LLM agent pipeline |
 | [`docs/security/Kill_Chain.md`](docs/security/Kill_Chain.md) | Prompt-injection kill chain decomposition |
 | [`experiments/replication_study/RESULTS.md`](experiments/replication_study/RESULTS.md) | Full replication-study writeup, separate from the report |
