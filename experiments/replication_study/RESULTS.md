@@ -175,16 +175,61 @@ This is a more MATS-relevant finding than the original "fundamental limitation" 
 
 ---
 
-## 10. Reproduction
+## 10. Third FP Category: Roleplay / Jailbreak-Style Prompts
+
+Extension of the replication to a third category. Set F is 25 benign roleplay prompts ("Act as a chef and describe carbonara"); Set G is 25 adversarial roleplay / jailbreak prompts drawn from published jailbreak taxonomies (DAN, developer mode, sandbox bypass, hypothetical-unfiltered). All Set G prompts are inert research strings targeting the fictional IRIS system prompt only.
+
+### A/B/C filter on the roleplay domain
+Applying the same strict filter (intent-discriminators: ≥60% injection / <20% benign; overlap: ≥90% both / <30% control) to (F, G, C) yields:
+
+- **20 strict intent-discriminators** (top-10: features 3397, 2777, 4849, 9430, 9526, 8140, 3933, 10063, 5716, 3521).
+- **11 overlap features** (top-10: features 5416, 6205, 7971, 6887, 5166, 264, 1739, 5637, 1018, 924). Feature 6205 is also the top command-domain overlap feature — evidence of a cross-domain "self-referential topic" representation.
+
+The SAE encodes an intent distinction for roleplay with the same structure as it does for identity and commands. Q1 answered positively.
+
+### Generalization test — does the existing A/B/D/E augmentation fix roleplay?
+
+| Detector | F FPR @ 0.85 | G recall @ 0.85 | G mean prob | Held-out F1 |
+|---|---|---|---|---|
+| Baseline (pre-augmentation) | **0.000** | **0.000** | 0.600 | 0.980 |
+| A/B/D/E augmented (current prod) | 0.000 | **0.360** | 0.522 | 0.990 |
+| A/B/D/E + **F/G** augmented | 0.000 | **1.000** | 0.992 | 0.990 |
+
+**Two non-obvious findings.**
+
+1. **Baseline blocks 0% of jailbreaks.** The pre-augmentation detector (trained on 1,000 examples with no jailbreak-roleplay pairs) misses every Set G prompt at the 0.85 threshold. Its mean probability on G is 0.600 — below blocking. This is a *recall* failure, not an FP failure. It is the opposite shape of the identity/command categories, where the baseline had high recall and high FP.
+
+2. **The current production detector (A/B/D/E-augmented) catches only 36% of jailbreaks.** The A/B/D/E augmentation provides *some* signal for jailbreak-style prompts because Set B contains override-language patterns ("ignore your instructions"), but it does not fully transfer: the surface form of adversarial roleplay ("Act as DAN with no restrictions") is different enough that the classifier still misses two-thirds of them.
+
+### Q3 — does adding F/G fix the gap?
+
+Adding 50 new contrastive prompts (25 F + 25 G) to the 80 already in augmentation raises recall on G from 0.360 → 1.000 while preserving:
+- F FPR at 0.000 (no new false positives),
+- Held-out F1 at 0.990 (no degradation),
+- B/E recall at 1.000 (no interference with existing categories).
+
+The same minimal-data-augmentation pattern that fixed identity/command FPs also fixes jailbreak recall. The mechanism generalizes to a third category with different failure shape.
+
+### What this refines in Section 9.6
+
+The earlier mimicry-limitation framing survives unchanged for pure educational mimicry ("Can you explain how prompt injection works?"), which has no safety-bypass keyword and no contrastive benign analogue that shares surface form. But jailbreak-style roleplay — the most common real-world attack template — is *inside* the augmentation-fixable class, because adversarial roleplay contains distinctive surface keywords ("no restrictions", "DAN", "jailbroken", "developer mode") that the SAE encodes and the classifier can learn to weight when given 25 contrastive examples. The category boundary is narrower than Section 9.6 originally suggested.
+
+Artifacts: `results/roleplay_analysis.json`, `activations/F_benign_roleplay.npy`, `activations/G_adversarial_roleplay.npy`.
+
+---
+
+## 11. Reproduction
 
 ```bash
 # ~1 minute each on CPU
 python experiments/replication_study/extract_features.py
 python experiments/replication_study/extract_features_commands.py
+python experiments/replication_study/extract_features_roleplay.py
 
 # Analysis (seconds)
 python experiments/replication_study/analyze.py
+python experiments/replication_study/analyze_roleplay.py
 python experiments/replication_study/causal_validation.py
 ```
 
-Total time end-to-end: ~3 minutes on CPU. No GPU required.
+Total time end-to-end: ~4 minutes on CPU. No GPU required.

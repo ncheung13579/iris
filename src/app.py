@@ -160,8 +160,10 @@ class IRISPipeline:
         X_train = self.feature_matrix[train_idx]
         y_train = labels[train_idx]
         aug_dir = self.root / "experiments/replication_study/activations"
-        aug_benign_sets = ["A_benign_identity", "D_benign_command"]
-        aug_injection_sets = ["B_injection_identity", "E_injection_command"]
+        aug_benign_sets = ["A_benign_identity", "D_benign_command",
+                           "F_benign_roleplay"]
+        aug_injection_sets = ["B_injection_identity", "E_injection_command",
+                              "G_adversarial_roleplay"]
         aug_added = 0
         if aug_dir.is_dir():
             try:
