@@ -109,7 +109,6 @@ iris/
 ├── README.md                              this file
 ├── launch.py                              entry point
 ├── requirements.txt                       pinned dependencies
-├── CLAUDE.md                              AI-assistance guardrails
 ├── src/                                   product code (dashboard, SAE, detectors, agent)
 ├── notebooks/                             research notebooks (see docs/Project_Report.md §B for the full list)
 ├── scripts/                               supporting scripts (dataset build, figure generation)
@@ -130,8 +129,6 @@ iris/
         ├── STRIDE_Analysis.md                 full STRIDE decomposition (39 threats, 5 stages)
         └── Kill_Chain.md                      kill chain adapted to prompt injection
 ```
-
-A `_private/` directory exists but is gitignored (archived pre-upgrade materials, internal notes, exploratory checkpoints).
 
 ---
 
