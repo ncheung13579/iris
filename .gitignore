@@ -13,11 +13,12 @@ data/raw/
 data/processed/*.json
 !data/processed/.gitkeep
 
-# Checkpoints (large — stored on Google Drive)
-# For submission: use checkpoints/download_checkpoints.py to fetch them
-checkpoints/*.pt
+# Checkpoints: the files required to run the dashboard and reproduce the
+# §5 detection results are tracked via Git LFS (see .gitattributes).
+# The raw per-layer activation .npz files are not tracked. They are
+# only needed to retrain the SAE from scratch, which is out of scope
+# for grading and requires a GPU.
 checkpoints/*.npz
-checkpoints/*.npy
 !checkpoints/.gitkeep
 !checkpoints/download_checkpoints.py
 
