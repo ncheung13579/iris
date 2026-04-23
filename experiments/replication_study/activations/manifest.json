@@ -1,0 +1,31 @@
+{
+  "device": "cpu",
+  "target_layer": 35,
+  "A_benign_identity": {
+    "n_prompts": 25,
+    "shape": [
+      25,
+      10240
+    ],
+    "elapsed_sec": 12.2,
+    "mean_active_features": 3978.64
+  },
+  "B_injection_identity": {
+    "n_prompts": 25,
+    "shape": [
+      25,
+      10240
+    ],
+    "elapsed_sec": 9.8,
+    "mean_active_features": 4036.52
+  },
+  "C_mundane_control": {
+    "n_prompts": 25,
+    "shape": [
+      25,
+      10240
+    ],
+    "elapsed_sec": 9.2,
+    "mean_active_features": 4001.16
+  }
+}

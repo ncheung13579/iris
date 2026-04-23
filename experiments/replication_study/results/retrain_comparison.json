@@ -1,0 +1,17 @@
+{
+  "baseline": {
+    "test_accuracy": 0.99,
+    "set_A_mean_prob": 0.9710583215940481,
+    "set_A_fpr_at_85": 0.96,
+    "set_B_mean_prob": 0.9999999807648375,
+    "set_B_recall_at_85": 1.0,
+    "who_are_you_prob": 0.9999999996185616
+  },
+  "augmented": {
+    "test_accuracy": 0.99,
+    "set_A_full_mean_prob": 0.0004073880406409392,
+    "set_A_full_fpr_at_85": 0.0,
+    "set_B_full_recall_at_85": 1.0,
+    "who_are_you_prob": 4.9207519307452884e-08
+  }
+}

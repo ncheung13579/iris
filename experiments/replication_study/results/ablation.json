@@ -1,0 +1,94 @@
+{
+  "baseline_no_ablation": {
+    "held_out_acc": 0.99,
+    "A_fpr": 0.0,
+    "D_fpr": 0.0,
+    "B_recall": 1.0,
+    "E_recall": 1.0
+  },
+  "conditions": [
+    {
+      "condition": "Ablate intent-disc (both cats, 40)",
+      "held_out_acc": 0.99,
+      "A_fpr": 0.0,
+      "D_fpr": 0.0,
+      "B_recall": 1.0,
+      "E_recall": 1.0,
+      "\u0394B": 0.0,
+      "\u0394E": 0.0,
+      "\u0394acc": 0.0
+    },
+    {
+      "condition": "Ablate top-20 identity intent",
+      "held_out_acc": 0.995,
+      "A_fpr": 0.0,
+      "D_fpr": 0.0,
+      "B_recall": 1.0,
+      "E_recall": 1.0,
+      "\u0394B": 0.0,
+      "\u0394E": 0.0,
+      "\u0394acc": 0.0050000000000000044
+    },
+    {
+      "condition": "Ablate top-20 command intent",
+      "held_out_acc": 0.99,
+      "A_fpr": 0.0,
+      "D_fpr": 0.0,
+      "B_recall": 1.0,
+      "E_recall": 1.0,
+      "\u0394B": 0.0,
+      "\u0394E": 0.0,
+      "\u0394acc": 0.0
+    },
+    {
+      "condition": "Ablate overlap features (both, 33)",
+      "held_out_acc": 0.99,
+      "A_fpr": 0.0,
+      "D_fpr": 0.0,
+      "B_recall": 1.0,
+      "E_recall": 1.0,
+      "\u0394B": 0.0,
+      "\u0394E": 0.0,
+      "\u0394acc": 0.0
+    },
+    {
+      "condition": "Ablate 40 RANDOM features (trial 1)",
+      "held_out_acc": 0.995,
+      "A_fpr": 0.0,
+      "D_fpr": 0.0,
+      "B_recall": 1.0,
+      "E_recall": 1.0,
+      "\u0394B": 0.0,
+      "\u0394E": 0.0,
+      "\u0394acc": 0.0050000000000000044
+    },
+    {
+      "condition": "Ablate 40 RANDOM features (trial 2)",
+      "held_out_acc": 0.99,
+      "A_fpr": 0.0,
+      "D_fpr": 0.0,
+      "B_recall": 1.0,
+      "E_recall": 1.0,
+      "\u0394B": 0.0,
+      "\u0394E": 0.0,
+      "\u0394acc": 0.0
+    },
+    {
+      "condition": "Ablate 40 RANDOM features (trial 3)",
+      "held_out_acc": 0.99,
+      "A_fpr": 0.0,
+      "D_fpr": 0.0,
+      "B_recall": 1.0,
+      "E_recall": 1.0,
+      "\u0394B": 0.0,
+      "\u0394E": 0.0,
+      "\u0394acc": 0.0
+    }
+  ],
+  "feature_counts": {
+    "intent_all": 40,
+    "overlap_all": 33,
+    "intent_id": 20,
+    "intent_cmd": 20
+  }
+}

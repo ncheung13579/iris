@@ -151,28 +151,83 @@ class IRISPipeline:
         # a much healthier regime for logistic regression.
         from sklearn.linear_model import LogisticRegression as LR
 
+        # Replication-study augmentation (see experiments/replication_study/
+        # and docs/Project_Report.md §5.8). Adds benign identity questions and
+        # benign imperative commands as label-0 examples, plus matching
+        # injection prompts as label-1 examples. Reduces FPR on benign
+        # self-directed questions and imperative commands without degrading
+        # injection recall or original held-out accuracy.
+        X_train = self.feature_matrix[train_idx]
+        y_train = labels[train_idx]
+        aug_dir = self.root / "experiments/replication_study/activations"
+        aug_benign_sets = ["A_benign_identity", "D_benign_command"]
+        aug_injection_sets = ["B_injection_identity", "E_injection_command"]
+        aug_added = 0
+        if aug_dir.is_dir():
+            try:
+                for name in aug_benign_sets:
+                    p = aug_dir / f"{name}.npy"
+                    if p.exists():
+                        feats = np.load(p)
+                        X_train = np.concatenate([X_train, feats])
+                        y_train = np.concatenate(
+                            [y_train, np.zeros(len(feats), dtype=int)]
+                        )
+                        aug_added += len(feats)
+                for name in aug_injection_sets:
+                    p = aug_dir / f"{name}.npy"
+                    if p.exists():
+                        feats = np.load(p)
+                        X_train = np.concatenate([X_train, feats])
+                        y_train = np.concatenate(
+                            [y_train, np.ones(len(feats), dtype=int)]
+                        )
+                        aug_added += len(feats)
+                if aug_added > 0:
+                    print(f"  [aug] +{aug_added} prompts from replication study "
+                          f"(intent-feature recovery)")
+            except Exception as e:
+                print(f"  [aug] skipped: {e}")
+                X_train = self.feature_matrix[train_idx]
+                y_train = labels[train_idx]
+                aug_added = 0
+
         # Stage 1: screen all 10,240 features to find the important ones
         screening_model = LR(
             random_state=42, max_iter=1000, solver="lbfgs", C=0.01,
         )
-        screening_model.fit(
-            self.feature_matrix[train_idx], labels[train_idx]
-        )
+        screening_model.fit(X_train, y_train)
         lr_weights = np.abs(screening_model.coef_[0])
         self.top_feature_indices = np.argsort(lr_weights)[::-1]
 
-        # Stage 2: retrain on top-50 features only (800/50 = 16:1 ratio)
-        TOP_K_DETECT = 50
+        # Stage 2: retrain on a top-K feature subset.
+        #
+        # Configuration history:
+        #   Pre-augmentation:   top-50, C=0.0001 — very conservative to prevent
+        #                       novel-topic FPs ("Tell me about Stalin" scored 70%).
+        #   With augmentation:  top-500, C=0.01  — augmentation examples provide
+        #                       enough training signal that aggressive regularization
+        #                       is no longer necessary. The Stalin FP drops from 70%
+        #                       to 7%, F1 improves from 0.980 to 0.990, and the
+        #                       identity/command FP categories collapse to 0.000.
+        #                       See docs/Project_Report.md §5.8 and
+        #                       experiments/replication_study/RESULTS.md.
+        if aug_added > 0:
+            TOP_K_DETECT = 500
+            FINAL_C = 0.01
+        else:
+            TOP_K_DETECT = 50
+            FINAL_C = 0.0001
         self._detect_feature_indices = self.top_feature_indices[:TOP_K_DETECT]
         self.sae_detector = LR(
-            random_state=42, max_iter=1000, solver="lbfgs", C=0.0001,
+            random_state=42, max_iter=1000, solver="lbfgs", C=FINAL_C,
         )
         self.sae_detector.fit(
-            self.feature_matrix[train_idx][:, self._detect_feature_indices],
-            labels[train_idx],
+            X_train[:, self._detect_feature_indices],
+            y_train,
         )
 
-        # Print held-out performance
+        # Print held-out performance (evaluated on original test split, unchanged)
         from sklearn.metrics import f1_score as _f1, accuracy_score as _acc
         test_preds = self.sae_detector.predict(
             self.feature_matrix[test_idx][:, self._detect_feature_indices]

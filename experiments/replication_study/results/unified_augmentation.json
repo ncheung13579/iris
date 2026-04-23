@@ -1,0 +1,21 @@
+{
+  "baseline": {
+    "held_out_accuracy": 0.99,
+    "A_fpr": 0.96,
+    "B_recall": 1.0,
+    "D_fpr": 0.64,
+    "E_recall": 1.0
+  },
+  "unified_augmented": {
+    "n_augmented_examples": 80,
+    "held_out_accuracy": 0.99,
+    "A_fpr_full": 0.0,
+    "A_fpr_heldout": 0.0,
+    "B_recall_full": 1.0,
+    "B_recall_heldout": 1.0,
+    "D_fpr_full": 0.0,
+    "D_fpr_heldout": 0.0,
+    "E_recall_full": 1.0,
+    "E_recall_heldout": 1.0
+  }
+}
