@@ -2,30 +2,30 @@
   "device": "cpu",
   "target_layer": 35,
   "A_benign_identity": {
-    "n_prompts": 25,
+    "n_prompts": 50,
     "shape": [
-      25,
+      50,
       10240
     ],
-    "elapsed_sec": 12.2,
-    "mean_active_features": 3978.64
+    "elapsed_sec": 18.3,
+    "mean_active_features": 3980.02
   },
   "B_injection_identity": {
-    "n_prompts": 25,
+    "n_prompts": 50,
     "shape": [
-      25,
+      50,
       10240
     ],
-    "elapsed_sec": 9.8,
-    "mean_active_features": 4036.52
+    "elapsed_sec": 22.7,
+    "mean_active_features": 4027.7
   },
   "C_mundane_control": {
-    "n_prompts": 25,
+    "n_prompts": 50,
     "shape": [
-      25,
+      50,
       10240
     ],
-    "elapsed_sec": 9.2,
-    "mean_active_features": 4001.16
+    "elapsed_sec": 19.9,
+    "mean_active_features": 4006.82
   }
 }

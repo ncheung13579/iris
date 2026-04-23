@@ -1,99 +1,99 @@
 {
   "BLOCK_THRESHOLD": 0.85,
   "prompt_counts": {
-    "F_benign_roleplay": 25,
-    "G_adversarial_roleplay": 25,
+    "F_benign_roleplay": 50,
+    "G_adversarial_roleplay": 50,
     "heldout_test": 200
   },
   "Q1_abc_filter_roleplay": {
     "n_intent_discriminators": 20,
     "top_intent_discriminators": [
-      3397,
       2777,
-      4849,
-      9430,
-      9526,
       8140,
-      3933,
-      10063,
-      5716,
-      3521,
-      6066,
-      6655,
+      9222,
+      4236,
       2012,
-      2603,
-      6492,
-      1548,
-      3712,
-      2616,
+      6066,
+      6746,
+      7532,
+      6655,
+      9282,
+      3521,
+      4561,
+      5551,
+      3432,
       8483,
-      6746
+      8961,
+      8740,
+      3716,
+      2199,
+      1548
     ],
     "n_overlap_features": 11,
     "top_overlap_features": [
-      5416,
+      6576,
       6205,
-      7971,
-      6887,
-      5166,
+      7061,
       264,
-      1739,
+      2924,
+      7971,
+      5166,
       5637,
       1018,
-      924,
-      4067
+      2703,
+      924
     ],
-    "frac_active_benign": 0.3856875,
-    "frac_active_injection": 0.3944453125,
-    "frac_active_control": 0.39073828125000004
+    "frac_active_benign": 0.38674023437500005,
+    "frac_active_injection": 0.397998046875,
+    "frac_active_control": 0.391291015625
   },
   "detectors": {
     "baseline_top50_C0.0001": {
       "held_out_f1": 0.9797979797979798,
       "held_out_acc": 0.98,
       "F_metrics": {
-        "mean_prob": 0.4661578213555774,
+        "mean_prob": 0.5035237520673939,
         "F_fpr_rate_at_0.85": 0.0,
         "min_prob": 0.14322313673777984,
         "max_prob": 0.8331947640245766
       },
       "G_metrics": {
-        "mean_prob": 0.5998979249069226,
+        "mean_prob": 0.6178507017076984,
         "G_recall_rate_at_0.85": 0.0,
-        "min_prob": 0.3338646948325939,
-        "max_prob": 0.814053311787276
+        "min_prob": 0.23003553580659855,
+        "max_prob": 0.8199116480961044
       }
     },
     "abde_augmented_top500_C0.01": {
       "held_out_f1": 0.98989898989899,
       "held_out_acc": 0.99,
       "F_metrics": {
-        "mean_prob": 0.03480622349965632,
+        "mean_prob": 0.04425040078523991,
         "F_fpr_rate_at_0.85": 0.0,
-        "min_prob": 2.0601321120733885e-07,
-        "max_prob": 0.3396256629628228
+        "min_prob": 3.4873331489919984e-06,
+        "max_prob": 0.5252269323610189
       },
       "G_metrics": {
-        "mean_prob": 0.5217838886175632,
-        "G_recall_rate_at_0.85": 0.36,
-        "min_prob": 0.012896636029761438,
-        "max_prob": 0.9999850578407464
+        "mean_prob": 0.807111303217082,
+        "G_recall_rate_at_0.85": 0.64,
+        "min_prob": 6.17507287771038e-05,
+        "max_prob": 0.9999924446023386
       }
     },
     "abdefg_augmented_top500_C0.01": {
       "held_out_f1": 0.98989898989899,
       "held_out_acc": 0.99,
       "F_metrics": {
-        "mean_prob": 0.004863340211078678,
+        "mean_prob": 0.007117216365472694,
         "F_fpr_rate_at_0.85": 0.0,
-        "min_prob": 7.045260411478027e-07,
-        "max_prob": 0.043319765525132926
+        "min_prob": 4.567153687438845e-06,
+        "max_prob": 0.06445664573358459
       },
       "G_metrics": {
-        "mean_prob": 0.9915575105132669,
-        "G_recall_rate_at_0.85": 1.0,
-        "min_prob": 0.9647824762273536,
-        "max_prob": 0.9999984950965212
+        "mean_prob": 0.9902826811116198,
+        "G_recall_rate_at_0.85": 0.98,
+        "min_prob": 0.802141748633089,
+        "max_prob": 0.9999972372921029
       }
     }
   }

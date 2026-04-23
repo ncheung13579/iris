@@ -1,0 +1,31 @@
+{
+  "prompts_per_set": 50,
+  "block_threshold": 0.85,
+  "baseline_top50_C1e-4": {
+    "A_fpr": 0.0,
+    "B_recall": 0.06,
+    "D_fpr": 0.0,
+    "E_recall": 0.44,
+    "F_fpr": 0.0,
+    "G_recall": 0.0,
+    "held_out_f1": 0.9797979797979798
+  },
+  "unified_ABDE_top500_C1e-2": {
+    "A_fpr": 0.0,
+    "B_recall": 1.0,
+    "D_fpr": 0.0,
+    "E_recall": 1.0,
+    "F_fpr": 0.0,
+    "G_recall": 0.64,
+    "held_out_f1": 0.98989898989899
+  },
+  "extended_ABDEFG_top500_C1e-2": {
+    "A_fpr": 0.0,
+    "B_recall": 1.0,
+    "D_fpr": 0.0,
+    "E_recall": 1.0,
+    "F_fpr": 0.0,
+    "G_recall": 0.98,
+    "held_out_f1": 0.98989898989899
+  }
+}

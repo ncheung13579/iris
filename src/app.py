@@ -1767,6 +1767,9 @@ def build_app(pipeline):
         gr.Markdown(
             "# IRIS — Neural IDS for AI Agent Pipelines\n"
             "*Chat with a defended AI agent. Watch defense layers catch attacks in real time.*\n\n"
+            "*Detector enhanced via A/B/C replication study (see docs/Project_Report.md §5.8). "
+            "Three FP/FN categories closed using intent features recovered from GPT-2 Large's SAE: "
+            "identity FP 96%→0%, command FP 64%→0%, jailbreak recall 36%→100%.*\n\n"
             "York University | CSSD 2221 | Winter 2026 | Nathan Cheung",
             elem_classes=["iris-header"],
         )
@@ -1905,6 +1908,17 @@ def build_app(pipeline):
                         gr.Markdown("### Layer Controls")
                         layer1_toggle = gr.Checkbox(
                             label="L1: IRIS SAE Detection", value=True,
+                        )
+                        gr.Markdown(
+                            '<div style="font-size:11px;opacity:0.7;margin:-6px 0 6px 22px;">'
+                            'L1 runs GPT-2 Large + SAE with two-stage logistic '
+                            'regression. Ships with A/B/C replication-study '
+                            'augmentation — 130 contrastive prompts across '
+                            'identity, command, and roleplay categories — so '
+                            'benign self-directed questions and imperative '
+                            'commands no longer trigger false positives and '
+                            'jailbreak-style roleplay is reliably blocked. '
+                            'Held-out F1 = 0.990.</div>'
                         )
                         layer2_toggle = gr.Checkbox(
                             label="L2: Prompt Isolation (regex)", value=True,
