@@ -69,6 +69,21 @@ notebooks/agent_model_comparison.ipynb
 results/figures/*.png
 !results/figures/.gitkeep
 
+# Scripts that are not part of the required pipeline. expand_dataset.py
+# is referenced by notebook 08 so it stays tracked; the others are:
+#   build_report.py          local-only tool for rebuilding the PDF
+#                            from the (gitignored) markdown source
+#   agent_cli.py             non-GUI alternative to launch.py; nothing
+#                            in the grading flow depends on it
+#   generate_deployment_figures.py  figures it produces are already
+#                                   embedded in the final PDF
+#   run_statistical_analysis.py  optional extra analyses; outputs are
+#                                not consumed by any tracked pipeline
+scripts/build_report.py
+scripts/agent_cli.py
+scripts/generate_deployment_figures.py
+scripts/run_statistical_analysis.py
+
 # OS
 .DS_Store
 Thumbs.db

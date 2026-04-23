@@ -111,7 +111,7 @@ iris/
 ├── requirements.txt                       pinned dependencies
 ├── src/                                   product code (dashboard, SAE, detectors, agent)
 ├── notebooks/                             research notebooks (see docs/Project_Report.md §B for the full list)
-├── scripts/                               supporting scripts (dataset build, figure generation)
+├── scripts/                               dataset build (invoked by notebook 08)
 ├── checkpoints/                           pre-trained SAE, feature matrix, sensitivity scores
 ├── data/                                  source and processed datasets
 ├── experiments/
