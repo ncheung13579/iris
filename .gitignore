@@ -41,6 +41,10 @@ venv/
 # Project status (internal working doc, not for submission)
 PROJECT_STATUS.md
 
+# Private workspace (non-submission files: archived versions, one-off
+# scripts, exploratory checkpoints, internal status docs)
+/_private/
+
 # OS
 .DS_Store
 Thumbs.db
