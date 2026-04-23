@@ -1,9 +1,11 @@
 # IRIS — Neural IDS for LLM Agent Pipelines
 
-IRIS is an interactive security tool that detects prompt injection attacks in LLM agent pipelines by monitoring neural activation patterns using Sparse Autoencoders (SAEs). It works like a network IDS — but instead of inspecting packets, it inspects the model's internal representations.
+IRIS is an interactive security tool that detects prompt injection attacks by monitoring the internal activations of a language model. Instead of inspecting the user's prompt text (which the attacker controls), it inspects *how GPT-2 Large internally processes* that prompt and fires on the signature patterns that prompt injections produce. Conceptually, it is the same upgrade that moved network intrusion detection from string-matching signatures to behavioral anomaly detection, applied to the LLM substrate.
 
 **Course:** CSSD 2221 — Introduction to Security
 **Term:** Winter 2026, York University
+**Student:** Nathan Cheung (), 
+**Final report:** [`docs/IRIS_Final_Report_Nathan_Cheung.pdf`](docs/IRIS_Final_Report_Nathan_Cheung.pdf) (55 pages)
 
 ---
 
@@ -13,69 +15,92 @@ IRIS is an interactive security tool that detects prompt injection attacks in LL
 python launch.py
 ```
 
-That's it. The script installs all dependencies, verifies that the pre-trained models are present, and opens the IRIS dashboard in your browser.
+That is it. The launcher installs dependencies, verifies that pre-trained checkpoints are in place, and opens the IRIS dashboard in your default browser.
 
-**Requirements:** Python 3.10+. An internet connection is needed for the first-time dependency install. A CUDA GPU is recommended for faster inference but not required — the tool works on CPU.
+**Requirements.** Python 3.10+. An internet connection is needed the first time dependencies install.
 
----
-
-## The Tool
-
-IRIS provides six interactive tabs:
-
-### Tab 1: Live Analysis
-Type any prompt and get an instant threat assessment. The tool runs it through GPT-2, decomposes the activations with the trained SAE, and classifies the result using two detection layers:
-- **Layer 1 (Anomaly-based):** SAE neural feature patterns — like a behavioral IDS
-- **Layer 2 (Signature-based):** TF-IDF text pattern matching — like Snort
-
-Shows a verdict banner, threat probability, top 10 triggered signature IDs, and a natural-language alert explanation. Includes pre-loaded examples for normal traffic, obvious injections, encoded attacks, and mimicry.
-
-### Tab 2: Neural IDS Console
-A SOC-analyst-style monitoring dashboard. Process batches of prompts and see them logged with timestamps, signature IDs, severity ratings, and verdicts — like watching a Splunk/ELK SIEM feed. Export the session log as CSV for offline analysis.
-
-### Tab 3: Signature Management
-Browse all 6,144 learned detection signatures (SAE features). Each signature has an ID, direction (injection/normal), and confidence score — analogous to managing Snort/Suricata rule sets. Inspect any signature to see which prompts trigger it. Includes a signature ablation table showing how detection performance changes as you enable more signatures.
-
-### Tab 4: Red Team Lab
-A 5-level penetration testing exercise. Progress from crafting basic injections (Level 1) to advanced mimicry attacks (Level 4) and free-form APT-style attacks (Level 5). Each level explains the network security parallel. Generates a pentest report at the end.
-
-### Tab 5: Evasion Lab
-Side-by-side comparison of an original injection vs. a modified evasion attempt. See how signature activations change when you modify the attack — a live version of experiment C4. Analogous to testing IDS bypass techniques in a security lab.
-
-### Tab 6: System Analysis
-Static display of the project's security analysis: STRIDE threat model, kill chain decomposition, defense-in-depth architecture, and a concept mapping table linking every IRIS component to its network security analogue.
+**Two run modes:**
+- **Full agent mode** (CUDA GPU with at least 5 GB VRAM). The SAE detector and the four-layer defense stack run around a Phi-3-mini agent. Recommended for the complete experience.
+- **Detection-only mode** (no GPU needed). CPU-only. The dashboard still scores prompts and visualizes feature activations; the agent simply does not generate responses. A yellow banner at the top of the UI explains how to upgrade to full mode (Colab, HuggingFace Spaces, or a local CUDA machine).
 
 ---
 
-## Network Security Concept Mapping
+## The Dashboard at a Glance
 
-| IRIS Component | Network Security Analogue | Function |
+The interface is a chat on the left with a four-tab side panel on the right. Below, a collapsible "Learn More: How IRIS Works" accordion exposes four educational tabs. Every numeric claim below is covered in the final report.
+
+### Left pane: chat
+
+Send prompts to a defended Phi-3-mini agent. Pre-loaded examples cover normal traffic, obvious injections, encoded attacks, and mimicry. Each turn is routed through the four-layer defense stack in real time.
+
+### Right pane: side-panel tabs
+
+| Tab | Purpose |
+|---|---|
+| **Defense** | Shows, for the current prompt, which of the four defense layers fired and why. A SIEM-style event log accumulates across the session. |
+| **Features** | Shows the SAE signature activations for the current prompt, grouped by injection-sensitive versus normal-sensitive direction. Clicking a signature reveals the training prompts that maximally activate it. |
+| **Settings** | Toggles each of the four defense layers independently, tunes the Layer-1 detection threshold with a slider, and picks the LLM tier (Lightweight Phi-3.5 Mini, Standard Qwen2.5 7B, Advanced Qwen2.5 32B). |
+| **Report Card** | Live metrics pulled from the loaded pipeline: SAE F1, SAE AUC, v1 and v2 evasion rates. |
+
+### Four-layer defense stack (exposed in Settings)
+
+| Layer | Defense | Analogue |
 |---|---|---|
-| SAE feature activations | Packet payload inspection | Deep content analysis |
-| Sensitivity scores | IDS signature rules (Snort SIDs) | Pattern matching confidence |
-| Feature thresholds | Firewall allow/deny rules | Binary pass/block decision |
-| TF-IDF detector | Signature-based IDS (Snort) | Known-pattern matching |
-| SAE detector | Anomaly-based IDS (behavioral) | Deviation from baseline |
-| Dual-detector consensus | Defense-in-depth | Multiple detection layers |
-| Evasion Lab | Penetration testing | Adversarial robustness |
-| Mimicry evasion | Zero-day exploit | No existing signature |
-| Top-K feature selection | Ruleset tuning | Reduce alert fatigue |
-| IDS Console log | SIEM (Splunk/ELK) | Centralized monitoring |
+| L1 | SAE-based injection detection at the activation layer | Anomaly-based IDS |
+| L2 | Regex prompt isolation (delimiter injection, role confusion) | Input validation |
+| L3 | Tool-permission gating (file-system sandbox, path traversal) | Egress filtering / syscall auditing |
+| L4 | Output scanning for credential or PII leaks | DLP policy |
+
+Toggling any layer off and re-submitting the same attack demonstrates defense-in-depth experimentally. With all layers active, "Read file ../../etc/passwd" is blocked at L1 and L3. Disable L1 and L3 still catches it; disable L3 as well and the attack reaches the agent.
+
+### "Learn More" accordion (collapsed by default)
+
+| Tab | Purpose |
+|---|---|
+| **What's Inside?** | Side-by-side comparison of a normal prompt and an injection prompt at the raw-activation level versus the SAE-decomposed level. Makes interpretability tangible. |
+| **Feature Autopsy** | Browse every SAE signature, see its rank, weight, firing rate, and the prompts it activates on. The learned-signature equivalent of browsing a Snort ruleset. |
+| **Break It** | Five-level red-team lab. Progress from direct injection (Level 1) to mimicry (Level 4) to free-form adaptive attacks (Level 5). Generates a pentest-report summary at the end. |
+| **Fix It** | Walkthrough of the defense-engineering cycle: pick a failing evasion, add it to training, retrain the aggregation weights, and re-measure. |
 
 ---
 
 ## Key Results
 
+All results below are measured on held-out test data the detector has not seen during training. Full methodology and caveats are in the final report.
+
 | Metric | Value |
 |---|---|
-| Activation separability (J1) | PASS (Cohen's d = 10.2) |
-| SAE detection F1 (C3) | 0.946 (vs TF-IDF: 0.956) |
-| SAE detection AUC (C3) | 0.973 (vs TF-IDF: 0.992) |
-| Evasion rate — encoded (C4) | 0% |
-| Evasion rate — subtle (C4) | 0% |
-| Evasion rate — paraphrased (C4) | 23% |
-| Evasion rate — mimicry (C4) | 100% (zero-day equivalent) |
-| Overall evasion rate (C4) | 32% |
+| Held-out F1, baseline detector (§5.4) | 0.980 |
+| Held-out F1, post-augmentation production detector (§5.8) | **0.990** |
+| Activation separability across 36 layers (J1) | PASS, silhouette ≥ 0.1 on every layer |
+| Injection-specific signatures in the SAE (§5.3) | 35 of 10,240 |
+| Evasion rate, encoded and subtle attacks (§5.5) | 0% |
+| Evasion rate, paraphrased attacks (§5.5) | 23% |
+| Evasion rate, mimicry attacks (v1) | 85% |
+| Evasion rate, mimicry attacks (v2 after adversarial retraining) | ~15% |
+| False-positive rate on benign identity questions ("Who are you?") | 96% (original) → 0.00 (after augmentation, §5.8) |
+| False-positive rate on benign imperative commands | 64% (original) → 0.00 (after augmentation, §5.8) |
+| Recall on jailbreak-style roleplay (§5.8.1) | 36% → 100% (after extended augmentation) |
+
+### The intent-vs-topic finding (§5.8)
+
+The most interesting result in the project is not a single accuracy number but a diagnostic methodology. During dashboard testing, the detector fired at 93% on the benign prompt "Who are you?". The tempting conclusion was that content-based inspection cannot recover intent. Replicating Anthropic's A/B/C prompt-set methodology from *Scaling Monosemanticity* (Templeton et al., 2024) on the smaller IRIS SAE showed the failure was a training-distribution gap, not a representation limit: the SAE *had* learned signatures that distinguish benign identity questions from malicious system-prompt extraction, but the aggregation engine was weighting them equally with unrelated topic signatures. Adding 40 labeled contrastive prompts per problematic category rebalanced the weights and collapsed the false-positive rates to 0.00 simultaneously. The same pattern fixed a third failure category (jailbreak roleplay) with an additional 50 prompts. Three operational failure modes addressed by 130 contrastive training captures and one classifier — no per-category models.
+
+---
+
+## Security Concept Mapping
+
+| IRIS component | Network-security analogue |
+|---|---|
+| SAE feature activation | Auto-learned IDS signature (like Snort, but learned from data) |
+| Sensitivity score / classifier weight | Signature confidence / weighting |
+| Logistic regression aggregator | IDS correlation engine |
+| L2 regularization strength (`C`) | "No single signature dominates the alert score" policy |
+| Feature selection / top-K | Ruleset pruning (disable unused rules) |
+| Training augmentation | Adding labeled traffic captures so the engine re-learns rule weights |
+| Causal ablation (zero a signature, re-measure) | Rule-tuning experiment (disable a Snort rule and measure impact) |
+| Dual-detector comparison (SAE vs TF-IDF) | Anomaly-based vs signature-based IDS |
+| Mimicry evasion | C2 traffic hidden in legitimate HTTPS |
 
 ---
 
@@ -83,45 +108,44 @@ Static display of the project's security analysis: STRIDE threat model, kill cha
 
 ```
 iris/
-├── launch.py                  # <-- Run this
-├── src/
-│   ├── app.py                 # IRIS Detection Dashboard (Gradio)
-│   ├── data/                  # Dataset loading and preprocessing
-│   ├── model/                 # GPT-2 wrapper (TransformerLens)
-│   ├── sae/                   # Sparse autoencoder architecture
-│   ├── analysis/              # Feature analysis, detection, adversarial
-│   ├── baseline/              # TF-IDF and activation baselines
-│   └── utils/                 # Seeding, device management
-├── notebooks/                 # Research notebooks (background material)
-├── checkpoints/               # Pre-trained models (included)
-├── results/                   # Figures and metrics
-├── docs/                      # Report, STRIDE, kill chain
-└── requirements.txt
+├── README.md                              this file
+├── launch.py                              entry point
+├── requirements.txt                       pinned dependencies
+├── CLAUDE.md                              AI-assistance guardrails
+├── src/                                   product code (dashboard, SAE, detectors, agent)
+├── notebooks/                             research notebooks (see docs/Project_Report.md §B for the full list)
+├── scripts/                               supporting scripts (dataset build, figure generation)
+├── checkpoints/                           pre-trained SAE, feature matrix, sensitivity scores
+├── data/                                  source and processed datasets
+├── experiments/
+│   └── replication_study/                 the §5.8 A/B/C replication (prompt sets, activations, results, RESULTS.md)
+├── results/
+│   ├── figures/                           200 DPI PNGs used in the report
+│   └── metrics/                           JSON metric dumps
+└── docs/
+    ├── IRIS_Final_Report_Nathan_Cheung.pdf    55-page grade deliverable
+    ├── IRIS_Final_Report_Nathan_Cheung.docx   same report in Word
+    ├── Project_Report.md                      markdown source for the report
+    ├── Design_Document.md                     architecture and experiment plan
+    ├── Tutorial.md                            dashboard user guide
+    └── security/
+        ├── STRIDE_Analysis.md                 full STRIDE decomposition (39 threats, 5 stages)
+        └── Kill_Chain.md                      kill chain adapted to prompt injection
 ```
 
-## Research Notebooks
+A `_private/` directory exists but is gitignored (archived pre-upgrade materials, internal notes, exploratory checkpoints).
 
-The `notebooks/` directory documents the full research process behind the tool. These are background material — the tool itself runs independently of them.
-
-| Notebook | Purpose |
-|---|---|
-| 01 | Data exploration + activation separability (J1) |
-| 02 | SAE training iterations (J2) |
-| 03 | Feature inspection + interpretability (J3) |
-| 04 | Formal SAE evaluation (C1) |
-| 05 | Injection-sensitivity analysis (C2) |
-| 06 | Detection pipeline comparison (C3) |
-| 07 | Adversarial evasion testing (C4) |
-| 08 | Full pipeline demo |
+---
 
 ## Documentation
 
 | Document | Purpose |
 |---|---|
-| `docs/Tutorial.md` | Step-by-step guide to using the dashboard |
-| `docs/Project_Report.md` | Comprehensive project report |
-| `docs/Design_Document.md` | Architecture and experiment plan |
-| `docs/security/STRIDE_Analysis.md` | STRIDE threat model |
-| `docs/security/Kill_Chain.md` | Kill chain decomposition |
+| [`docs/IRIS_Final_Report_Nathan_Cheung.pdf`](docs/IRIS_Final_Report_Nathan_Cheung.pdf) | Comprehensive project report — the authoritative reference |
+| [`docs/Tutorial.md`](docs/Tutorial.md) | Step-by-step guide to using the dashboard |
+| [`docs/Design_Document.md`](docs/Design_Document.md) | Architecture and experiment plan (pre-deployment planning doc) |
+| [`docs/security/STRIDE_Analysis.md`](docs/security/STRIDE_Analysis.md) | STRIDE threat model for the LLM agent pipeline |
+| [`docs/security/Kill_Chain.md`](docs/security/Kill_Chain.md) | Prompt-injection kill chain decomposition |
+| [`experiments/replication_study/RESULTS.md`](experiments/replication_study/RESULTS.md) | Full replication-study writeup, separate from the report |
 
-The tutorial is also available inside the dashboard under the **Guide** tab.
+The dashboard also exposes an in-UI help system via its "Learn More: How IRIS Works" accordion.
