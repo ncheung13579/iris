@@ -1,4 +1,4 @@
-"""Build IRIS_Final_Report_Nathan_Cheung.{docx,pdf} from docs/Project_Report.md.
+"""Build IRIS_Final_Report.{docx,pdf} from docs/Project_Report.md.
 
 Pipeline:
   1. pandoc   docs/Project_Report.md  ->  .docx   (with TOC, figures, YAML title page)
@@ -19,8 +19,8 @@ from pypdf import PdfReader
 
 ROOT = Path(__file__).parent.parent
 MD   = ROOT / "docs" / "Project_Report.md"
-DOCX = ROOT / "docs" / "IRIS_Final_Report_Nathan_Cheung.docx"
-PDF  = ROOT / "docs" / "IRIS_Final_Report_Nathan_Cheung.pdf"
+DOCX = ROOT / "docs" / "IRIS_Final_Report.docx"
+PDF  = ROOT / "docs" / "IRIS_Final_Report.pdf"
 
 # Paragraphs that should be justified. Everything else (headings, code, title-
 # page elements, figure captions, table cells) stays at its pandoc default.
