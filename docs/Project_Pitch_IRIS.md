@@ -1,6 +1,6 @@
 # IRIS: Interpretability Research for Injection Security
 
-## Project Proposal — CSSD 2221 Vulnerabilities & Classifications
+## Project Proposal — CSSD 2221 Introduction to Security
 
 **Student:** Nathan Cheung ()
 **Date:** March 2026
