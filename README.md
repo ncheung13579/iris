@@ -110,7 +110,7 @@ iris/
 ├── launch.py                              entry point
 ├── requirements.txt                       pinned dependencies
 ├── src/                                   product code (dashboard, SAE, detectors, agent)
-├── notebooks/                             research notebooks (17 numbered + launch_IRIS + mimicry_diagnostic)
+├── notebooks/                             research notebooks (see docs/Project_Report.md §B for the full list)
 ├── scripts/                               dataset build (invoked by notebook 08)
 ├── checkpoints/                           pre-trained SAE, feature matrix, sensitivity scores
 ├── data/                                  source and processed datasets
@@ -120,6 +120,7 @@ iris/
 │   ├── figures/                           200 DPI PNGs used in the report
 │   └── metrics/                           JSON metric dumps
 └── docs/
+    ├── IRIS_Final_Report.pdf                  55-page grade deliverable
     └── security/
         ├── STRIDE_Analysis.md                 full STRIDE decomposition (39 threats, 5 stages)
         └── Kill_Chain.md                      kill chain adapted to prompt injection
@@ -129,12 +130,11 @@ iris/
 
 ## Documentation
 
-The full project report is delivered to the course instructor separately and is not included in this public repository. The documents below support understanding and replication.
-
 | Document | Purpose |
 |---|---|
+| [`docs/IRIS_Final_Report.pdf`](docs/IRIS_Final_Report.pdf) | Comprehensive project report, the authoritative reference |
 | [`docs/security/STRIDE_Analysis.md`](docs/security/STRIDE_Analysis.md) | STRIDE threat model for the LLM agent pipeline |
 | [`docs/security/Kill_Chain.md`](docs/security/Kill_Chain.md) | Prompt-injection kill chain decomposition |
-| [`experiments/replication_study/RESULTS.md`](experiments/replication_study/RESULTS.md) | Full replication-study writeup |
+| [`experiments/replication_study/RESULTS.md`](experiments/replication_study/RESULTS.md) | Full replication-study writeup, separate from the report |
 
 The dashboard also exposes an in-UI help system via its "Learn More: How IRIS Works" accordion.

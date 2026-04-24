@@ -1,7 +1,7 @@
 # STRIDE Threat Model — LLM Agent Pipeline
 
 **Project:** IRIS (Interpretability Research for Injection Security)
-**Author:** Nathan Cheung
+**Author:** Nathan Cheung ()
 **Date:** March 2026
 **Scope:** Five-stage LLM agent pipeline from training data ingestion through output delivery
 
@@ -12,11 +12,11 @@
 1. [Introduction](#1-introduction)
 2. [Pipeline Architecture and Trust Boundaries](#2-pipeline-architecture-and-trust-boundaries)
 3. [STRIDE Analysis by Pipeline Stage](#3-stride-analysis-by-pipeline-stage)
- - [Stage 1: Training Data](#stage-1-training-data)
- - [Stage 2: System Prompt Assembly](#stage-2-system-prompt-assembly)
- - [Stage 3: Model Processing](#stage-3-model-processing)
- - [Stage 4: Tool/Action Execution](#stage-4-toolaction-execution)
- - [Stage 5: Output Delivery](#stage-5-output-delivery)
+   - [Stage 1: Training Data](#stage-1-training-data)
+   - [Stage 2: System Prompt Assembly](#stage-2-system-prompt-assembly)
+   - [Stage 3: Model Processing](#stage-3-model-processing)
+   - [Stage 4: Tool/Action Execution](#stage-4-toolaction-execution)
+   - [Stage 5: Output Delivery](#stage-5-output-delivery)
 4. [Risk Matrix Summary](#4-risk-matrix-summary)
 5. [Connecting STRIDE to IRIS Experimental Results](#5-connecting-stride-to-iris-experimental-results)
 6. [Conclusions](#6-conclusions)
@@ -59,39 +59,39 @@ We assume the attacker is an external user who can only control the user input f
 ### 2.1 Data Flow Diagram
 
 ```
- TRUST BOUNDARY 1 TRUST BOUNDARY 2
- (Developer ↔ Data) (System ↔ User)
- │ │
- │ │
- ┌─────────────┐ │ ┌──────────────┐ │ ┌──────────────┐
- │ STAGE 1 │ │ │ STAGE 2 │ │ │ STAGE 3 │
- │ Training │──────────┼───→│ System │───────────┼───→│ Model │
- │ Data │ │ │ Prompt │ │ │ Processing │
- │ │ │ │ Assembly │ │ │ │
- │ • Curated │ │ │ • System │ │ │ • Tokenize │
- │ datasets │ │ │ prompt │ │ │ • Forward │
- │ • Fine-tune │ │ │ • User input │ │ │ pass │
- │ data │ │ │ • Context │ │ │ • Internal │
- │ • RLHF │ │ │ window │ │ │ activations│
- └─────────────┘ │ └──────────────┘ │ └──────┬───────┘
- │ │ │
- │ │ │
- │ TRUST BOUNDARY 3 │ │
- │ (Model ↔ Tools) │ │
- │ │ │ │
- │ │ │ ▼
- ┌─────────────┐ │ ┌───────────┴──┐ │ ┌──────────────┐
- │ STAGE 5 │ │ │ STAGE 4 │ │ │ │
- │ Output │←─────────┼────│ Tool/Action │←──────────┼────│ Model │
- │ Delivery │ │ │ Execution │ │ │ decides │
- │ │ │ │ │ │ │ action │
- │ • Response │ │ │ • API calls │ │ └──────────────┘
- │ to user │ │ │ • DB queries │ │
- │ • To down- │ │ │ • Code exec │ │
- │ stream │ │ │ • File I/O │ │
- │ systems │ │ └──────────────┘ │
- └─────────────┘ │ │
- │ │
+                    TRUST BOUNDARY 1                TRUST BOUNDARY 2
+                    (Developer ↔ Data)               (System ↔ User)
+                           │                                │
+                           │                                │
+  ┌─────────────┐          │    ┌──────────────┐           │    ┌──────────────┐
+  │  STAGE 1    │          │    │  STAGE 2     │           │    │  STAGE 3     │
+  │  Training   │──────────┼───→│  System      │───────────┼───→│  Model       │
+  │  Data       │          │    │  Prompt      │           │    │  Processing  │
+  │             │          │    │  Assembly    │           │    │              │
+  │ • Curated   │          │    │ • System     │           │    │ • Tokenize   │
+  │   datasets  │          │    │   prompt     │           │    │ • Forward    │
+  │ • Fine-tune │          │    │ • User input │           │    │   pass       │
+  │   data      │          │    │ • Context    │           │    │ • Internal   │
+  │ • RLHF      │          │    │   window     │           │    │   activations│
+  └─────────────┘          │    └──────────────┘           │    └──────┬───────┘
+                           │                                │           │
+                           │                                │           │
+                           │         TRUST BOUNDARY 3       │           │
+                           │         (Model ↔ Tools)        │           │
+                           │                │               │           │
+                           │                │               │           ▼
+  ┌─────────────┐          │    ┌───────────┴──┐           │    ┌──────────────┐
+  │  STAGE 5    │          │    │  STAGE 4     │           │    │              │
+  │  Output     │←─────────┼────│  Tool/Action │←──────────┼────│  Model       │
+  │  Delivery   │          │    │  Execution   │           │    │  decides     │
+  │             │          │    │              │           │    │  action      │
+  │ • Response  │          │    │ • API calls  │           │    └──────────────┘
+  │   to user   │          │    │ • DB queries │           │
+  │ • To down-  │          │    │ • Code exec  │           │
+  │   stream    │          │    │ • File I/O   │           │
+  │   systems   │          │    └──────────────┘           │
+  └─────────────┘          │                                │
+                           │                                │
 ```
 
 ### 2.2 Trust Boundaries
@@ -110,31 +110,31 @@ The pipeline has three critical trust boundaries:
 
 ```mermaid
 flowchart LR
- subgraph TB1["Trust Boundary 1: Developer ↔ Data"]
- S1["Stage 1\nTraining Data"]
- end
+    subgraph TB1["Trust Boundary 1: Developer ↔ Data"]
+        S1["Stage 1\nTraining Data"]
+    end
 
- subgraph TB2["Trust Boundary 2: System ↔ User"]
- S2["Stage 2\nSystem Prompt Assembly"]
- S3["Stage 3\nModel Processing"]
- end
+    subgraph TB2["Trust Boundary 2: System ↔ User"]
+        S2["Stage 2\nSystem Prompt Assembly"]
+        S3["Stage 3\nModel Processing"]
+    end
 
- subgraph TB3["Trust Boundary 3: Model ↔ Tools"]
- S4["Stage 4\nTool/Action Execution"]
- end
+    subgraph TB3["Trust Boundary 3: Model ↔ Tools"]
+        S4["Stage 4\nTool/Action Execution"]
+    end
 
- S5["Stage 5\nOutput Delivery"]
+    S5["Stage 5\nOutput Delivery"]
 
- U["Untrusted\nUser Input"] -->|"crosses TB2"| S2
- S1 --> S2
- S2 --> S3
- S3 -->|"model decides action"| S4
- S4 --> S5
- S3 -->|"direct response"| S5
+    U["Untrusted\nUser Input"] -->|"crosses TB2"| S2
+    S1 --> S2
+    S2 --> S3
+    S3 -->|"model decides action"| S4
+    S4 --> S5
+    S3 -->|"direct response"| S5
 
- style U fill:#ff6b6b,color:#fff
- style S2 stroke:#ff0000,stroke-width:3px
- style S4 stroke:#ff0000,stroke-width:3px
+    style U fill:#ff6b6b,color:#fff
+    style S2 stroke:#ff0000,stroke-width:3px
+    style S4 stroke:#ff0000,stroke-width:3px
 ```
 
 ---
@@ -479,12 +479,12 @@ Encoded injections use character-level obfuscation (l33t speak, spacing tricks, 
 ### 5.3 Summary: What the IRIS Results Tell Us About the Threat Landscape
 
 ```
- Evasion Strategy STRIDE Category Evasion Rate Detector Verdict
- ───────────────── ───────────────────── ────────────── ─────────────────
- Encoded Tampering (T3.1) 0% ROBUST
- Subtle Info Disclosure (I2.1) 0% ROBUST
- Paraphrased Tampering (T2.1) 23% PARTIALLY VULNERABLE
- Mimicry Spoofing (S3.1) 100% VULNERABLE
+  Evasion Strategy     STRIDE Category          Evasion Rate     Detector Verdict
+  ─────────────────    ─────────────────────    ──────────────   ─────────────────
+  Encoded              Tampering (T3.1)              0%          ROBUST
+  Subtle               Info Disclosure (I2.1)        0%          ROBUST
+  Paraphrased          Tampering (T2.1)             23%          PARTIALLY VULNERABLE
+  Mimicry              Spoofing (S3.1)             100%          VULNERABLE
 ```
 
 The pattern is clear and instructive:
