@@ -19,7 +19,7 @@ Why these sources?
     we need ~500 total for balanced training. Templates ensure diversity
     across four attack categories from the Design Document.
 
-Author: Nathan Cheung ()
+Author: Nathan Cheung
 York University | CSSD 2221 | Winter 2026
 """
 

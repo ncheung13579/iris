@@ -14,7 +14,7 @@ Design decisions:
   - The system prompt prefix is applied here (not in the model module)
     so that all downstream stages see identical inputs.
 
-Author: Nathan Cheung ()
+Author: Nathan Cheung
 York University | CSSD 2221 | Winter 2026
 """
 

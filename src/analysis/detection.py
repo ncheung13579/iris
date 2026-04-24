@@ -18,7 +18,7 @@ downstream detection.
 
 See Design Document §4.4 and §6.2 (C3) for the experiment definition.
 
-Author: Nathan Cheung ()
+Author: Nathan Cheung
 York University | CSSD 2221 | Winter 2026
 """
 

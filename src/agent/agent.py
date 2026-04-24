@@ -13,7 +13,7 @@ Design decisions:
   - All 3 model tiers use permissive open licenses (MIT / Apache 2.0) and
     require NO HuggingFace authentication.
 
-Author: Nathan Cheung ()
+Author: Nathan Cheung
 York University | CSSD 2221 | Winter 2026
 """
 

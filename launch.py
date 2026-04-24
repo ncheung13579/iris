@@ -9,7 +9,7 @@ verify checkpoints, and launch the interactive dashboard.
 Usage:
     python launch.py
 
-Author: Nathan Cheung ()
+Author: Nathan Cheung
 York University | CSSD 2221 | Winter 2026
 """
 
@@ -52,7 +52,7 @@ BANNER = f"""
 
   {BOLD}Neural IDS for LLM Agent Pipelines{RESET}
   {DIM}Interpretability Research for Injection Security{RESET}
-  {DIM}Nathan Cheung (){RESET}
+  {DIM}Nathan Cheung{RESET}
   {DIM}York University | CSSD 2221 | Winter 2026{RESET}
 """
 
@@ -215,55 +215,86 @@ def install_dependencies(root: Path) -> None:
 
 
 def verify_checkpoints(root: Path) -> None:
-    """Check that all required model files exist."""
+    """Check that all required model files exist, downloading the large
+    ones from the GitHub Release if the local copy is missing or is a
+    Git LFS pointer (which happens when the repo was fetched as a ZIP
+    or cloned without git-lfs installed).
+    """
+    RELEASE_URL = (
+        "https://github.com/ncheung13579/iris/releases/download/v1.0.0"
+    )
+
+    # For each required file:
+    #   (description, min_real_size, release_asset_name_or_None, how_to_regenerate)
     required = {
         "checkpoints/sae_d10240_lambda1e-04.pt": (
             "Sparse Autoencoder (10240-dim, trained on GPT-2 Large layer 29)",
-            "notebook 04",
+            100_000_000, "sae_d10240_lambda1e-04.pt", "notebook 04",
         ),
         "checkpoints/sensitivity_scores.npy": (
             "Injection-sensitivity scores (10240 signature weights)",
-            "notebook 05",
+            10_000, "sensitivity_scores.npy", "notebook 05",
         ),
         "checkpoints/feature_matrix.npy": (
             "Feature activation matrix (1000 prompts x 10240 features)",
-            "notebook 05",
+            10_000_000, "feature_matrix.npy", "notebook 05",
         ),
         "data/processed/iris_dataset_balanced.json": (
             "Curated dataset (500 normal + 500 injection prompts)",
-            "notebook 01",
+            100_000, "iris_dataset_balanced.json", "notebook 01",
         ),
         "results/metrics/j2_evaluation.json": (
             "SAE evaluation metrics (target layer, train config)",
-            "notebook 02",
+            50, None, "notebook 02",
         ),
         "results/metrics/c3_detection_comparison.json": (
             "Detection pipeline comparison (F1, AUC for all approaches)",
-            "notebook 06",
+            50, None, "notebook 06",
         ),
         "results/metrics/c4_adversarial_evasion.json": (
             "Adversarial evasion rates per strategy",
-            "notebook 07",
+            50, None, "notebook 07",
         ),
         "results/metrics/defense_v2.json": (
             "Defense v1 vs v2 comparison (evasion reduction)",
-            "notebook 16",
+            50, None, "notebook 16",
         ),
     }
 
     total_size = 0
     missing = []
 
-    for fpath, (desc, source) in required.items():
+    for fpath, (desc, min_size, asset, source) in required.items():
         p = root / fpath
-        if p.exists():
+        needs_fetch = (not p.exists()) or (p.stat().st_size < min_size)
+
+        if needs_fetch and asset is not None:
+            # Auto-download from GitHub Release.
+            import urllib.request
+            if p.exists():
+                # Likely a Git LFS pointer file; remove before writing real binary.
+                p.unlink()
+            p.parent.mkdir(parents=True, exist_ok=True)
+            url = f"{RELEASE_URL}/{asset}"
+            info(f"Fetching {fpath} from release (this is a one-time download)...")
+            try:
+                urllib.request.urlretrieve(url, p)
+            except Exception as exc:  # noqa: BLE001
+                fail(f"Download failed: {exc}")
+                info(f"Manually download {asset} from {url}")
+                info(f"and place it at {fpath}")
+                missing.append(fpath)
+                continue
+            needs_fetch = p.stat().st_size < min_size
+
+        if p.exists() and not needs_fetch:
             sz = p.stat().st_size
             total_size += sz
             ok(f"{fpath} {DIM}({size_str(sz)}){RESET}")
             info(desc)
         else:
             fail(f"{fpath} --{RED}MISSING{RESET}")
-            info(f"{desc}")
+            info(desc)
             info(f"Generate with: {source}")
             missing.append(fpath)
 

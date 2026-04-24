@@ -10,7 +10,7 @@ Design decision: Tools are pure functions wrapped in dataclasses, not
 LLM-driven. The agent uses keyword-based dispatch (deterministic and
 reliable for a graded demo) rather than asking the LLM to select tools.
 
-Author: Nathan Cheung ()
+Author: Nathan Cheung
 York University | CSSD 2221 | Winter 2026
 """
 

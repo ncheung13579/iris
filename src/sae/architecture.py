@@ -12,7 +12,7 @@ Architecture (from Design Document §4.2):
     Decoder: x̂ = W_dec · f + b_dec         W_dec ∈ R^(768 × d_sae)
     Loss = ||x - x̂||² + λ · ||f||₁
 
-Author: Nathan Cheung ()
+Author: Nathan Cheung
 York University | CSSD 2221 | Winter 2026
 """
 

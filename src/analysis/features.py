@@ -14,7 +14,7 @@ distinguish the two classes.
 
 See Design Document §4.3 for the formal definition.
 
-Author: Nathan Cheung ()
+Author: Nathan Cheung
 York University | CSSD 2221 | Winter 2026
 """
 

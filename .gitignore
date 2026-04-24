@@ -24,7 +24,6 @@ data/processed/*.json
 # for grading and requires a GPU.
 checkpoints/*.npz
 !checkpoints/.gitkeep
-!checkpoints/download_checkpoints.py
 
 # Results — INCLUDED for submission (force-added)
 # results/figures/*.png

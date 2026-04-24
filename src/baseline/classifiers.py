@@ -15,7 +15,7 @@ The comparison between tiers 2 and 3 is the core experiment (C3): it tests
 whether the SAE decomposition adds value beyond what's already present in
 the raw activation space.
 
-Author: Nathan Cheung ()
+Author: Nathan Cheung
 York University | CSSD 2221 | Winter 2026
 """
 

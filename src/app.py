@@ -22,7 +22,7 @@ Usage (Colab):
 Usage (local):
     python -m src.app
 
-Author: Nathan Cheung ()
+Author: Nathan Cheung
 York University | CSSD 2221 | Winter 2026
 """
 

@@ -11,7 +11,7 @@ Key analyses:
   - Category-specific features (one-vs-rest)
   - Attack type classification from feature patterns
 
-Author: Nathan Cheung ()
+Author: Nathan Cheung
 York University | CSSD 2221 | Winter 2026
 """
 

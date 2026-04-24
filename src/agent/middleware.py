@@ -9,7 +9,7 @@ The middleware operates on a separate model (GPT-2 + SAE) from the application
 model (Phi-3), analogous to a network IDS that inspects traffic independently
 of the application it protects.
 
-Author: Nathan Cheung ()
+Author: Nathan Cheung
 York University | CSSD 2221 | Winter 2026
 """
 

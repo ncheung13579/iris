@@ -14,7 +14,7 @@ Why TransformerLens instead of raw HuggingFace?
   stream after layer 6). With raw HuggingFace, we'd need to register
   forward hooks manually and handle the model internals ourselves.
 
-Author: Nathan Cheung ()
+Author: Nathan Cheung
 York University | CSSD 2221 | Winter 2026
 """
 

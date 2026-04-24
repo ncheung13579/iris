@@ -18,7 +18,7 @@ with new attack vectors targeting the defended agent pipeline:
 For each strategy, generates examples, runs through IRIS, records evasion
 rates, and extracts feature vectors for successful evasions.
 
-Author: Nathan Cheung ()
+Author: Nathan Cheung
 York University | CSSD 2221 | Winter 2026
 """
 

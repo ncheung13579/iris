@@ -22,7 +22,7 @@ Metrics computed:
      inspect whether clusters exist. These are qualitative (projections
      can distort distances) but invaluable for sanity checking.
 
-Author: Nathan Cheung ()
+Author: Nathan Cheung
 York University | CSSD 2221 | Winter 2026
 """
 
