@@ -342,8 +342,9 @@ class IRISPipeline:
 
         # Whitelist: GPU model-name tokens that pair with enough system
         # RAM on Colab (and comparable server GPUs elsewhere) to
-        # reliably load Phi-3.5 without an OOM.
-        LLM_CAPABLE_GPUS = ("L4", "A40", "A100", "H100", "H200")
+        # reliably load Phi-3.5 without an OOM. "RTX PRO 6000" covers
+        # Colab's G4 tier (Blackwell architecture, ~96 GB VRAM).
+        LLM_CAPABLE_GPUS = ("L4", "A40", "A100", "H100", "H200", "RTX PRO 6000")
 
         skip_reason: Optional[str] = None
         if force_skip:
@@ -358,8 +359,8 @@ class IRISPipeline:
                     f"{gpu_name} does not have enough paired system RAM to "
                     f"safely load Phi-3.5; the fp16 weight streaming step "
                     f"peaks at ~8 GB before quantization. Full agent mode "
-                    f"requires an L4, A40, A100, or H100-class runtime. "
-                    f"Set IRIS_ENABLE_LLM=1 to try anyway."
+                    f"requires an L4, A40, A100, H100, or G4 (RTX PRO 6000) "
+                    f"runtime. Set IRIS_ENABLE_LLM=1 to try anyway."
                 )
 
         if skip_reason:
