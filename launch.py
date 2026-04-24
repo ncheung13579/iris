@@ -221,7 +221,7 @@ def verify_checkpoints(root: Path) -> None:
     or cloned without git-lfs installed).
     """
     RELEASE_URL = (
-        "https://github.com/ncheung13579/iris/releases/download/v1.0.0"
+        "https://github.com/ncheung13579/iris/releases/download/v2.0.0"
     )
 
     # For each required file:
