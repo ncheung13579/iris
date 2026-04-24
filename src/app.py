@@ -330,50 +330,37 @@ class IRISPipeline:
 
         import os
 
-        # Pre-flight memory check. HuggingFace streams the Phi-3.5
+        # Pre-flight GPU-tier check. HuggingFace streams the Phi-3.5
         # fp16 weights (~7.6 GB) through CPU before bitsandbytes
-        # quantizes them to 4-bit. On Colab T4 (12.7 GB system RAM)
-        # this OOM-kills the runtime, which Python cannot catch. Skip
-        # the load when available RAM is below a safe threshold so the
-        # dashboard comes up in detection-only mode instead of crashing.
-        # IRIS_ENABLE_LLM=1 forces the load anyway (for power users).
+        # quantizes them to 4-bit. On anything smaller than an L4
+        # (22 GB VRAM / 50 GB system RAM on Colab), this OOM-kills
+        # the runtime during load — Python can't catch that. Only
+        # L4-class GPUs and up are whitelisted to attempt the load.
+        # IRIS_ENABLE_LLM=1 forces the load anyway.
         force_enable = os.environ.get("IRIS_ENABLE_LLM", "").strip() in ("1", "true", "True")
         force_skip   = os.environ.get("IRIS_SKIP_LLM",   "").strip() in ("1", "true", "True")
 
-        def _available_ram_gb() -> Optional[float]:
-            try:
-                import psutil  # pre-installed on Colab
-                return psutil.virtual_memory().available / (1024 ** 3)
-            except Exception:
-                return None
+        # Whitelist: GPU model-name tokens that pair with enough system
+        # RAM on Colab (and comparable server GPUs elsewhere) to
+        # reliably load Phi-3.5 without an OOM.
+        LLM_CAPABLE_GPUS = ("L4", "A40", "A100", "H100", "H200")
 
         skip_reason: Optional[str] = None
         if force_skip:
             skip_reason = "IRIS_SKIP_LLM=1 is set"
         elif not force_enable:
-            avail_gb = _available_ram_gb()
-            if avail_gb is not None and avail_gb < 10.0:
+            try:
+                gpu_name = torch.cuda.get_device_name(0)
+            except Exception:
+                gpu_name = "the current GPU"
+            if not any(tok in gpu_name for tok in LLM_CAPABLE_GPUS):
                 skip_reason = (
-                    f"only {avail_gb:.1f} GB of system RAM is free and Phi-3.5 "
-                    f"loading needs ~8 GB in fp16 before quantization; skipping "
-                    f"to avoid an OOM. Set IRIS_ENABLE_LLM=1 to try anyway."
+                    f"{gpu_name} does not have enough paired system RAM to "
+                    f"safely load Phi-3.5; the fp16 weight streaming step "
+                    f"peaks at ~8 GB before quantization. Full agent mode "
+                    f"requires an L4, A40, A100, or H100-class runtime. "
+                    f"Set IRIS_ENABLE_LLM=1 to try anyway."
                 )
-            else:
-                # Fallback: detect Colab T4 by name. T4 has 15 GB VRAM but
-                # Colab pairs it with only 12.7 GB system RAM, which is too
-                # tight for Phi-3.5 loading even though psutil may not yet
-                # reflect that (cached memory hasn't been released).
-                try:
-                    gpu_name = torch.cuda.get_device_name(0)
-                    if "T4" in gpu_name:
-                        skip_reason = (
-                            f"{gpu_name} paired with Colab's 12.7 GB system RAM "
-                            f"can OOM during Phi-3.5 load; skipping to keep the "
-                            f"dashboard up. Use an L4/A100 runtime (or set "
-                            f"IRIS_ENABLE_LLM=1) for the full agent."
-                        )
-                except Exception:
-                    pass
 
         if skip_reason:
             print(f"  LLM: skipped — {skip_reason}")
