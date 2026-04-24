@@ -327,14 +327,57 @@ class IRISPipeline:
             self.llm_model = None
             self.defense_stack = None
             return
-        # Explicit opt-out: some environments (notably Colab T4, which has
-        # only ~12.7 GB of system RAM) can OOM during HuggingFace's fp16
-        # weight streaming before bitsandbytes quantization kicks in. Set
-        # IRIS_SKIP_LLM=1 to keep the detector + feature tabs working
-        # without loading the agent.
+
         import os
-        if os.environ.get("IRIS_SKIP_LLM", "").strip() not in ("", "0", "false", "False"):
-            print("  LLM: skipped (IRIS_SKIP_LLM set — detection-only mode)")
+
+        # Pre-flight memory check. HuggingFace streams the Phi-3.5
+        # fp16 weights (~7.6 GB) through CPU before bitsandbytes
+        # quantizes them to 4-bit. On Colab T4 (12.7 GB system RAM)
+        # this OOM-kills the runtime, which Python cannot catch. Skip
+        # the load when available RAM is below a safe threshold so the
+        # dashboard comes up in detection-only mode instead of crashing.
+        # IRIS_ENABLE_LLM=1 forces the load anyway (for power users).
+        force_enable = os.environ.get("IRIS_ENABLE_LLM", "").strip() in ("1", "true", "True")
+        force_skip   = os.environ.get("IRIS_SKIP_LLM",   "").strip() in ("1", "true", "True")
+
+        def _available_ram_gb() -> Optional[float]:
+            try:
+                import psutil  # pre-installed on Colab
+                return psutil.virtual_memory().available / (1024 ** 3)
+            except Exception:
+                return None
+
+        skip_reason: Optional[str] = None
+        if force_skip:
+            skip_reason = "IRIS_SKIP_LLM=1 is set"
+        elif not force_enable:
+            avail_gb = _available_ram_gb()
+            if avail_gb is not None and avail_gb < 10.0:
+                skip_reason = (
+                    f"only {avail_gb:.1f} GB of system RAM is free and Phi-3.5 "
+                    f"loading needs ~8 GB in fp16 before quantization; skipping "
+                    f"to avoid an OOM. Set IRIS_ENABLE_LLM=1 to try anyway."
+                )
+            else:
+                # Fallback: detect Colab T4 by name. T4 has 15 GB VRAM but
+                # Colab pairs it with only 12.7 GB system RAM, which is too
+                # tight for Phi-3.5 loading even though psutil may not yet
+                # reflect that (cached memory hasn't been released).
+                try:
+                    gpu_name = torch.cuda.get_device_name(0)
+                    if "T4" in gpu_name:
+                        skip_reason = (
+                            f"{gpu_name} paired with Colab's 12.7 GB system RAM "
+                            f"can OOM during Phi-3.5 load; skipping to keep the "
+                            f"dashboard up. Use an L4/A100 runtime (or set "
+                            f"IRIS_ENABLE_LLM=1) for the full agent."
+                        )
+                except Exception:
+                    pass
+
+        if skip_reason:
+            print(f"  LLM: skipped — {skip_reason}")
+            print(f"        Detection + feature inspection remain fully available.")
             self.llm_model = None
             self.defense_stack = None
             return
