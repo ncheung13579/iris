@@ -46,11 +46,13 @@ PROJECT_STATUS.md
 # scripts, exploratory checkpoints, internal status docs)
 /_private/
 
-# Report source and Word version: only the PDF is tracked for grading.
-# The DOCX and the markdown source remain locally for rebuild purposes
-# but are not part of the submission surface.
-docs/Project_Report.md
+# Report artifacts: delivered to the professor separately, never
+# committed. The PDF, DOCX, and markdown source all contain the
+# author's email and student number on the title page and are not
+# part of the public repo.
+docs/IRIS_Final_Report.pdf
 docs/IRIS_Final_Report.docx
+docs/Project_Report.md
 
 # AI-assistance guardrails (not part of the submission)
 CLAUDE.md
