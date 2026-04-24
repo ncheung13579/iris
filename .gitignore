@@ -8,10 +8,14 @@ build/
 # Jupyter
 .ipynb_checkpoints/
 
-# Data (large files — include download script instead)
+# Data
+# Raw sources are gitignored (notebook 08 re-fetches them from HuggingFace).
+# Processed JSONs are also gitignored by default *except* the balanced
+# dataset that the dashboard and the replication-study scripts load.
 data/raw/
 data/processed/*.json
 !data/processed/.gitkeep
+!data/processed/iris_dataset_balanced.json
 
 # Checkpoints: the files required to run the dashboard and reproduce the
 # §5 detection results are tracked via Git LFS (see .gitattributes).
