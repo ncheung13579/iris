@@ -53,10 +53,13 @@ PROJECT_STATUS.md
 # Report artifacts: delivered to the professor separately, never
 # committed. The PDF, DOCX, and markdown source all contain the
 # author's email and student number on the title page and are not
-# part of the public repo.
-docs/IRIS_Final_Report.pdf
-docs/IRIS_Final_Report.docx
+# part of the public repo. Pattern covers any variant filename (local
+# backups, alternative naming, etc.) and Word's lock files (~$*).
+docs/IRIS*Report*.pdf
+docs/IRIS*Report*.docx
 docs/Project_Report.md
+~$*
+**/~$*
 
 # AI-assistance guardrails (not part of the submission)
 CLAUDE.md
