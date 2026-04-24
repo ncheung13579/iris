@@ -327,6 +327,17 @@ class IRISPipeline:
             self.llm_model = None
             self.defense_stack = None
             return
+        # Explicit opt-out: some environments (notably Colab T4, which has
+        # only ~12.7 GB of system RAM) can OOM during HuggingFace's fp16
+        # weight streaming before bitsandbytes quantization kicks in. Set
+        # IRIS_SKIP_LLM=1 to keep the detector + feature tabs working
+        # without loading the agent.
+        import os
+        if os.environ.get("IRIS_SKIP_LLM", "").strip() not in ("", "0", "false", "False"):
+            print("  LLM: skipped (IRIS_SKIP_LLM set — detection-only mode)")
+            self.llm_model = None
+            self.defense_stack = None
+            return
         try:
             from src.agent.agent import load_llm, detect_best_tier, AgentPipeline
             from src.agent.tools import build_tool_registry
