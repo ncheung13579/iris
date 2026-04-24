@@ -18,8 +18,8 @@ That is it. The launcher installs dependencies, verifies that pre-trained checkp
 **Requirements.** Python 3.10+. An internet connection is needed the first time dependencies install.
 
 **Two run modes:**
-- **Full agent mode** (CUDA GPU with at least 5 GB VRAM). The SAE detector and the four-layer defense stack run around a Phi-3-mini agent. Recommended for the complete experience.
-- **Detection-only mode** (no GPU needed). CPU-only. The dashboard still scores prompts and visualizes feature activations; the agent simply does not generate responses. A yellow banner at the top of the UI explains how to upgrade to full mode (Colab, HuggingFace Spaces, or a local CUDA machine).
+- **Full agent mode** (NVIDIA L4 / G4 / A40 / A100 / H100-class GPU paired with ≥16 GB of system RAM). The SAE detector and the four-layer defense stack run around a Phi-3.5-mini agent that actually generates responses. On Google Colab this means a **Colab Pro L4**, **Colab Pro+ A100**, or **G4 (RTX PRO 6000)** runtime.
+- **Detection-only mode** (anything else — CPU, T4, V100, consumer cards). The dashboard still scores prompts and visualizes feature activations, and defense layers 2–4 still fire. The Phi-3.5 agent is skipped automatically to avoid an OOM during model loading; the chat shows verdicts but no generated responses. The skip is transparent: a yellow banner at the top of the UI explains why and how to upgrade.
 
 ---
 
@@ -29,7 +29,7 @@ The interface is a chat on the left with a four-tab side panel on the right. Bel
 
 ### Left pane: chat
 
-Send prompts to a defended Phi-3-mini agent. Pre-loaded examples cover normal traffic, obvious injections, encoded attacks, and mimicry. Each turn is routed through the four-layer defense stack in real time.
+Send prompts to the defended pipeline. On an L4 / G4 / A100 runtime the Phi-3.5-mini agent generates real responses; on smaller runtimes the chat shows defense verdicts only. Pre-loaded examples cover normal traffic, obvious injections, encoded attacks, and mimicry. Each turn is routed through the four-layer defense stack in real time.
 
 ### Right pane: side-panel tabs
 

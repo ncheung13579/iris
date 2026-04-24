@@ -341,15 +341,15 @@ class AgentPipeline:
 LLM_MODELS = {
     "lightweight": (
         "microsoft/Phi-3.5-mini-instruct",
-        "Phi-3.5 Mini (3.8B) — T4 compatible",
+        "Phi-3.5 Mini (3.8B, 4-bit quantized) — requires L4 or better",
     ),
     "standard": (
         "Qwen/Qwen2.5-7B-Instruct",
-        "Qwen2.5 7B — L4 compatible",
+        "Qwen2.5 7B (4-bit quantized) — requires L4 or better",
     ),
     "advanced": (
         "Qwen/Qwen2.5-32B-Instruct",
-        "Qwen2.5 32B — A100 recommended",
+        "Qwen2.5 32B (4-bit quantized) — requires A100 or better",
     ),
 }
 

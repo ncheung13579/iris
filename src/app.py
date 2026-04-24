@@ -11,7 +11,7 @@ Layout:
     + Learn More accordion (What's Inside / Feature Autopsy / Break It / Fix It)
 
 LLM Tiers (all no-auth, permissive licenses):
-    - Lightweight: Phi-3.5-mini (3.8B) — T4 compatible
+    - Lightweight: Phi-3.5-mini (3.8B, 4-bit) — requires L4 or better
     - Standard:    Qwen2.5-7B         — L4 compatible
     - Advanced:    Qwen2.5-32B        — A100 recommended
 
@@ -1840,9 +1840,12 @@ def build_app(pipeline):
                 '<td style="padding: 6px 8px; font-weight: 600; vertical-align: top; '
                 'white-space: nowrap;">Google Colab</td>'
                 '<td style="padding: 6px 8px;">Upload the project to Drive, open '
-                '<code>notebooks/launch_IRIS.ipynb</code> in Colab, set runtime to '
-                '<b>T4 GPU</b>, and click <em>Run All</em>. Easiest option — works with '
-                'a free Colab account. Supports the Lightweight tier (Phi-3.5 Mini, 3.8B).</td></tr>'
+                '<code>notebooks/launch_IRIS.ipynb</code> in Colab, and click <em>Run '
+                'All</em>. Set the runtime to <b>L4 GPU</b> (Colab Pro), <b>G4 GPU</b> '
+                '(RTX PRO 6000), or <b>A100 GPU</b> for full agent mode. A free-tier '
+                '<b>T4</b> runtime also works but falls back to detection-only mode '
+                'because the Phi-3.5 weight-streaming step would OOM Colab\'s 12.7 GB '
+                'system RAM.</td></tr>'
                 '<tr style="border-bottom: 1px solid rgba(245, 158, 11, 0.4);">'
                 '<td style="padding: 6px 8px; font-weight: 600; vertical-align: top; '
                 'white-space: nowrap;">HuggingFace Spaces</td>'
@@ -1853,15 +1856,17 @@ def build_app(pipeline):
                 '<td style="padding: 6px 8px; font-weight: 600; vertical-align: top; '
                 'white-space: nowrap;">Local GPU</td>'
                 '<td style="padding: 6px 8px;">Run <code>python launch.py</code> on a '
-                'machine with an NVIDIA GPU (15&nbsp;GB+ VRAM). '
-                'Requires CUDA drivers and <code>bitsandbytes</code>.</td></tr>'
+                'machine with an NVIDIA L4/A40/A100/H100/RTX PRO 6000 class GPU and '
+                '&ge;&nbsp;16&nbsp;GB of paired system RAM. Requires CUDA drivers '
+                'and <code>bitsandbytes</code>. Smaller GPUs run the detector but '
+                'skip the Phi-3.5 agent.</td></tr>'
                 '<tr>'
                 '<td style="padding: 6px 8px; font-weight: 600; vertical-align: top; '
                 'white-space: nowrap;">Model tiers</td>'
                 '<td style="padding: 6px 8px;">'
-                '<b>Lightweight</b> — Phi-3.5 Mini (3.8B), ~5 GB VRAM, T4 compatible<br>'
-                '<b>Standard</b> — Qwen2.5 7B, ~7 GB VRAM, L4 compatible<br>'
-                '<b>Advanced</b> — Qwen2.5 32B, ~21 GB VRAM, A100 recommended</td></tr>'
+                '<b>Lightweight</b> — Phi-3.5 Mini (3.8B, 4-bit), ~2 GB VRAM / ~8 GB load-time RAM, needs L4 or better<br>'
+                '<b>Standard</b> — Qwen2.5 7B (4-bit), ~4 GB VRAM / ~15 GB load-time RAM, needs L4 or better<br>'
+                '<b>Advanced</b> — Qwen2.5 32B (4-bit), ~16 GB VRAM / ~65 GB load-time RAM, needs A100 or better</td></tr>'
                 '</table>'
                 '</div></details></div>'
             )
@@ -2014,8 +2019,8 @@ def build_app(pipeline):
                                 'border: 1px solid #F59E0B; '
                                 'border-radius: 6px; padding: 8px 12px; font-size: 12px; '
                                 'color: var(--body-text-color); margin-bottom: 8px;">'
-                                'No GPU — model switching unavailable. '
-                                'Run on Colab (T4) for full agent mode.</div>'
+                                'No capable GPU — model switching unavailable. '
+                                'Run on Colab with an L4, G4, or A100 runtime for full agent mode.</div>'
                             )
                         model_status = gr.HTML(
                             value=f'<div style="font-size:12px;opacity:0.7;">'
